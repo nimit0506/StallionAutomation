@@ -4,15 +4,15 @@
 
 ### Terminal 1: Start Gazebo
 ```bash
-cd ~/
-bash /mnt/c/Users/SACHIN/Stallion/scripts/launch_gazebo_only.sh
+cd /path/to/StallionAutomation
+bash scripts/launch_gazebo_only.sh
 ```
 Wait until the Gazebo 3D window appears with the Stallion model on the ground.
 
 ### Terminal 2: Start SITL
 ```bash
-cd ~/
-bash /mnt/c/Users/SACHIN/Stallion/scripts/launch_sitl_only.sh
+cd /path/to/StallionAutomation
+bash scripts/launch_sitl_only.sh
 ```
 Wait for MAVProxy to connect. You should see `GPS fix` and heartbeat messages.
 
@@ -35,8 +35,25 @@ mode QLAND
 
 ## Quick Start (Single-Terminal Method)
 ```bash
-bash /mnt/c/Users/SACHIN/Stallion/scripts/start_gazebo_stallion.sh
+bash scripts/start_gazebo_stallion.sh
 ```
+
+---
+
+## Automated Flight Check
+With Gazebo + SITL running, in a third terminal:
+```bash
+python3 scripts/sitl_hover_check.py                 # hover: QHOVER climb, hold, QLAND
+python3 scripts/sitl_hover_check.py --transition --climb-time 30 --climb-throttle 1800
+                                                    # + transition to FBWB forward flight
+```
+Prints altitude/attitude/servo outputs and a PASS/FAIL verdict.
+
+### Paths
+The scripts find the repo from their own location, so they work from any clone
+(WSL or plain Linux). Override if your installs live elsewhere:
+`ARDUPILOT_DIR=~/ardupilot ARDUPILOT_GZ_DIR=~/ardupilot_gazebo bash scripts/launch_sitl_only.sh`.
+WSLg display settings and the Windows Mission Planner address are only applied on WSL.
 
 ---
 
@@ -82,7 +99,7 @@ Verify: `ls ~/ardupilot_gazebo/build/libArduPilotPlugin.so` should exist.
 ## Autonomous Mission
 After SITL is running:
 ```
-wp load /mnt/c/Users/SACHIN/Stallion/missions/chennai_loop_01.waypoints
+wp load /path/to/StallionAutomation/missions/chennai_loop_01.waypoints
 mode QHOVER
 arm throttle
 mode AUTO

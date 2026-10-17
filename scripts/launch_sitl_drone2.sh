@@ -8,8 +8,9 @@
 #  Run in a separate terminal from Drone 1 (launch_sitl_only.sh).
 # =================================================================
 
-STALLION_DIR="/mnt/c/Users/SACHIN/Stallion"
-ARDUPILOT_DIR="${HOME}/ardupilot"
+# Repo root (override with STALLION_DIR=... if needed)
+STALLION_DIR="${STALLION_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+ARDUPILOT_DIR="${ARDUPILOT_DIR:-${HOME}/ardupilot}"
 PARAM_FILE="${STALLION_DIR}/params/stallion_drone2_sitl.parm"
 
 if [ ! -d "${ARDUPILOT_DIR}" ]; then
@@ -39,7 +40,12 @@ echo ""
 cd "${ARDUPILOT_DIR}"
 
 # Windows host IP for Mission Planner connection (Drone 2 uses port 14560)
-WINDOWS_HOST=$(ip route show default | awk '/default/ {print $3}' | head -1)
+# Windows host IP for Mission Planner (WSL only; plain Linux uses localhost)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    WINDOWS_HOST=$(ip route show default | awk '/default/ {print $3}' | head -1)
+else
+    WINDOWS_HOST=127.0.0.1
+fi
 
 echo ">>> Connect Mission Planner (2nd window) → UDP ${WINDOWS_HOST}:14560"
 echo ""

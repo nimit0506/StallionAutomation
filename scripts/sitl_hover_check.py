@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""
+sitl_hover_check.py — automated hover test for the Stallion VTOL in Gazebo SITL.
+
+Run with Gazebo + SITL already up (launch_gazebo_only.sh + launch_sitl_only.sh):
+    python3 scripts/sitl_hover_check.py --connect udp:127.0.0.1:14550
+
+Sequence: QHOVER -> arm -> climb with throttle -> hold -> QLAND.
+Prints altitude/attitude while flying and a PASS/FAIL verdict at the end.
+"""
+import argparse
+import math
+import sys
+import time
+
+from pymavlink import mavutil
+
+
+def wait_heartbeat(m, timeout=60):
+    hb = m.wait_heartbeat(timeout=timeout)
+    if hb is None:
+        sys.exit("FAIL: no heartbeat from SITL")
+    print(f"Heartbeat from system {m.target_system}")
+
+
+def set_mode(m, mode, timeout=10):
+    m.set_mode(mode)
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        hb = m.recv_match(type="HEARTBEAT", blocking=True, timeout=1)
+        if hb and mavutil.mode_string_v10(hb) == mode:
+            return
+    sys.exit(f"FAIL: could not enter {mode}")
+
+
+def rc_throttle(m, pwm):
+    # Channel 3 override, others released (0 = no override, 65535 = ignore)
+    m.mav.rc_channels_override_send(m.target_system, m.target_component,
+                                    0, 0, pwm, 0, 0, 0, 0, 0)
+
+
+def fly(m, seconds, throttle, log):
+    t_end = time.time() + seconds
+    while time.time() < t_end:
+        rc_throttle(m, throttle)
+        msg = m.recv_match(type=["GLOBAL_POSITION_INT", "ATTITUDE", "VFR_HUD", "SERVO_OUTPUT_RAW"], blocking=True, timeout=0.2)
+        if msg is None:
+            continue
+        if msg.get_type() == "SERVO_OUTPUT_RAW":
+            log["servo"] = (msg.servo4_raw, msg.servo6_raw, msg.servo7_raw, msg.servo8_raw)
+            continue
+        if msg.get_type() == "VFR_HUD":
+            log["gs"] = msg.groundspeed
+            continue
+        if msg.get_type() == "ATTITUDE":
+            log["roll"] = math.degrees(msg.roll)
+            log["pitch"] = math.degrees(msg.pitch)
+            log["max_tilt"] = max(log["max_tilt"], abs(log["roll"]), abs(log["pitch"]))
+        else:
+            log["alt"] = msg.relative_alt / 1000.0
+            log["max_alt"] = max(log["max_alt"], log["alt"])
+        now = time.time()
+        if now - log["last_print"] > 1.0:
+            log["last_print"] = now
+            print(f"  alt={log['alt']:6.2f} m  roll={log['roll']:6.1f}  pitch={log['pitch']:6.1f}  gs={log['gs']:5.1f} m/s  "
+                  f"tilt/ail/elev/rud={log['servo']}")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--connect", default="udp:127.0.0.1:14550")
+    ap.add_argument("--climb-throttle", type=int, default=1700)
+    ap.add_argument("--hold-throttle", type=int, default=1500)
+    ap.add_argument("--min-alt", type=float, default=3.0, help="altitude needed to pass (m)")
+    ap.add_argument("--max-tilt", type=float, default=25.0, help="max roll/pitch allowed (deg)")
+    ap.add_argument("--transition", action="store_true",
+                    help="after the hover climb, transition to forward flight (FBWB, altitude hold) and check it flies")
+    ap.add_argument("--climb-time", type=float, default=10.0)
+    args = ap.parse_args()
+
+    m = mavutil.mavlink_connection(args.connect)
+    wait_heartbeat(m)
+    m.mav.request_data_stream_send(m.target_system, m.target_component,
+                                   mavutil.mavlink.MAV_DATA_STREAM_ALL, 10, 1)
+
+    set_mode(m, "QHOVER")
+    rc_throttle(m, 1000)
+    print("Arming...")
+    # Retry: pre-arm checks (EKF, IMU consistency) can take a while to settle after boot
+    t0 = time.time()
+    last_try = 0
+    while not m.motors_armed():
+        if time.time() - last_try > 3:
+            last_try = time.time()
+            m.arducopter_arm()
+        msg = m.recv_match(type=["HEARTBEAT", "STATUSTEXT"], blocking=True, timeout=1)
+        if msg and msg.get_type() == "STATUSTEXT":
+            print(f"  [{msg.text}]")
+        if time.time() - t0 > 180:
+            sys.exit("FAIL: vehicle did not arm")
+    print("Armed")
+
+    log = {"alt": 0.0, "roll": 0.0, "pitch": 0.0, "max_alt": 0.0, "max_tilt": 0.0, "gs": 0.0, "servo": (0, 0, 0, 0), "last_print": 0}
+    print(f"Climbing (throttle {args.climb_throttle})...")
+    fly(m, args.climb_time, args.climb_throttle, log)
+    print(f"Holding (throttle {args.hold_throttle})...")
+    fly(m, 10, args.hold_throttle, log)
+
+    if args.transition:
+        print("Transition to forward flight (FBWB, throttle 1800)...")
+        set_mode(m, "FBWB")
+        log["max_tilt"] = 0.0  # judge forward flight on its own
+        log["min_alt_fw"] = 1e9
+        t_end = time.time() + 30
+        max_gs = 0.0
+        while time.time() < t_end:
+            fly(m, 1, 1800, log)
+            max_gs = max(max_gs, log["gs"])
+            log["min_alt_fw"] = min(log["min_alt_fw"], log["alt"])
+        fw_ok = max_gs >= 12 and log["min_alt_fw"] > 2 and log["max_tilt"] <= 45
+        print(f"\nforward flight: max_gs={max_gs:.1f} m/s  min_alt={log['min_alt_fw']:.1f} m  "
+              f"max_tilt={log['max_tilt']:.1f} deg  -> {'PASS' if fw_ok else 'FAIL'}")
+        print("Back to QHOVER, then QLAND...")
+        set_mode(m, "QHOVER")
+        fly(m, 15, 1500, log)
+        set_mode(m, "QLAND")
+        fly(m, 20, 1500, log)
+        sys.exit(0 if fw_ok else 1)
+    print("Landing (QLAND)...")
+    set_mode(m, "QLAND")
+    fly(m, 15, 1500, log)
+
+    ok = log["max_alt"] >= args.min_alt and log["max_tilt"] <= args.max_tilt
+    print(f"\nmax_alt={log['max_alt']:.2f} m  max_tilt={log['max_tilt']:.1f} deg")
+    print("PASS" if ok else "FAIL")
+    sys.exit(0 if ok else 1)
+
+
+if __name__ == "__main__":
+    main()

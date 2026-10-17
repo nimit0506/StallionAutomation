@@ -342,37 +342,91 @@
       </visual>
     </link>
 
+
+    <!-- ==================== CONTROL SURFACES ====================
+         Aerodynamic-only links (no visuals: the CAD meshes already show them).
+         Positive angle about +Y = trailing edge UP; about +Z = trailing edge RIGHT.
+         The tail is modelled as a conventional elevator + fin, matching the
+         params (SERVO7 = elevator, SERVO8 = rudder, no V-tail mixing).
+    -->
+    <joint name="aileron_left_joint" type="revolute">
+      <pose relative_to="base_link">-0.10 0.45 -0.04 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>aileron_left</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.4</lower><upper>0.4</upper></limit>
+        <dynamics><damping>0.01</damping></dynamics>
+      </axis>
+    </joint>
+    <link name="aileron_left">
+      <pose relative_to="aileron_left_joint">0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia><ixx>1e-5</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-5</iyy><iyz>0</iyz><izz>1e-5</izz></inertia>
+      </inertial>
+    </link>
+
+    <joint name="aileron_right_joint" type="revolute">
+      <pose relative_to="base_link">-0.10 -0.45 -0.04 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>aileron_right</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.4</lower><upper>0.4</upper></limit>
+        <dynamics><damping>0.01</damping></dynamics>
+      </axis>
+    </joint>
+    <link name="aileron_right">
+      <pose relative_to="aileron_right_joint">0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia><ixx>1e-5</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-5</iyy><iyz>0</iyz><izz>1e-5</izz></inertia>
+      </inertial>
+    </link>
+
+    <joint name="elevator_joint" type="revolute">
+      <pose relative_to="base_link">-0.62 0 0.05 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>elevator</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.4</lower><upper>0.4</upper></limit>
+        <dynamics><damping>0.01</damping></dynamics>
+      </axis>
+    </joint>
+    <link name="elevator">
+      <pose relative_to="elevator_joint">0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia><ixx>1e-5</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-5</iyy><iyz>0</iyz><izz>1e-5</izz></inertia>
+      </inertial>
+    </link>
+
+    <joint name="rudder_joint" type="revolute">
+      <pose relative_to="base_link">-0.62 0 0.10 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>rudder</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-0.4</lower><upper>0.4</upper></limit>
+        <dynamics><damping>0.01</damping></dynamics>
+      </axis>
+    </joint>
+    <link name="rudder">
+      <pose relative_to="rudder_joint">0 0 0 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia><ixx>1e-5</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-5</iyy><iyz>0</iyz><izz>1e-5</izz></inertia>
+      </inertial>
+    </link>
+
     <!-- ======================== SIMULATION PLUGINS ======================== -->
 
     <plugin name="gz::sim::systems::JointStatePublisher"
         filename="gz-sim-joint-state-publisher-system">
     </plugin>
 
-    <!-- Required for ArduPilotPlugin control on all 6 joints -->
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>fl_tilt_joint</jointName>
-    </plugin>
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>fr_tilt_joint</jointName>
-    </plugin>
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>rear_yaw_joint</jointName>
-    </plugin>
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>fl_motor_joint</jointName>
-    </plugin>
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>fr_motor_joint</jointName>
-    </plugin>
-    <plugin filename="gz-sim-apply-joint-force-system"
-        name="gz::sim::systems::ApplyJointForce">
-      <jointName>rear_motor_joint</jointName>
-    </plugin>
 
     <!-- =================================================================
          PROP THRUST: LiftDrag Plugins
@@ -480,22 +534,82 @@
       <link_name>rear_motor_link</link_name>
     </plugin>
 
-    <!-- Wing Aerodynamics for forward flight -->
+    <!-- Wing + tail aerodynamics for forward flight (split per side so ailerons work) -->
+    <!-- Left wing panel + aileron -->
     <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
-      <a0>0.05</a0>
+      <a0>0.10</a0>
       <alpha_stall>0.3491</alpha_stall>
       <cla>5.0</cla>
       <cda>0.02</cda>
       <cma>0.0</cma>
-      <cla_stall>-0.2</cla_stall>
+      <cla_stall>-2.0</cla_stall>
       <cda_stall>1.0</cda_stall>
       <cma_stall>0.0</cma_stall>
-      <area>0.18</area>
+      <area>0.11</area>
       <air_density>1.2041</air_density>
-      <cp>0 0 0</cp>
+      <cp>0.05 0.28 0</cp>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
+      <control_joint_name>aileron_left_joint</control_joint_name>
+      <control_joint_rad_to_cl>-1.5</control_joint_rad_to_cl>
+    </plugin>
+    <!-- Right wing panel + aileron -->
+    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
+      <a0>0.10</a0>
+      <alpha_stall>0.3491</alpha_stall>
+      <cla>5.0</cla>
+      <cda>0.02</cda>
+      <cma>0.0</cma>
+      <cla_stall>-2.0</cla_stall>
+      <cda_stall>1.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.11</area>
+      <air_density>1.2041</air_density>
+      <cp>0.05 -0.28 0</cp>
+      <forward>1 0 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>aileron_right_joint</control_joint_name>
+      <control_joint_rad_to_cl>-1.5</control_joint_rad_to_cl>
+    </plugin>
+    <!-- Horizontal tail + elevator -->
+    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
+      <a0>0.0</a0>
+      <alpha_stall>0.30</alpha_stall>
+      <cla>4.0</cla>
+      <cda>0.03</cda>
+      <cma>0.0</cma>
+      <cla_stall>-2.0</cla_stall>
+      <cda_stall>1.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.05</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.62 0 0.05</cp>
+      <forward>1 0 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>elevator_joint</control_joint_name>
+      <control_joint_rad_to_cl>-3.0</control_joint_rad_to_cl>
+    </plugin>
+    <!-- Vertical fin + rudder -->
+    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
+      <a0>0.0</a0>
+      <alpha_stall>0.30</alpha_stall>
+      <cla>4.0</cla>
+      <cda>0.03</cda>
+      <cma>0.0</cma>
+      <cla_stall>-2.0</cla_stall>
+      <cda_stall>1.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.025</area>
+      <air_density>1.2041</air_density>
+      <cp>-0.62 0 0.10</cp>
+      <forward>1 0 0</forward>
+      <upward>0 1 0</upward>
+      <link_name>base_link</link_name>
+      <control_joint_name>rudder_joint</control_joint_name>
+      <control_joint_rad_to_cl>3.0</control_joint_rad_to_cl>
     </plugin>
 
     <!-- =================================================================
@@ -626,6 +740,78 @@
         <cmd_max>10.0</cmd_max>
         <cmd_min>-10.0</cmd_min>
         <cmd_offset>0</cmd_offset>
+      </control>
+
+      <!-- ch5: SERVO6 Aileron (left) — roll right = left TE down -->
+      <control channel="5">
+        <jointName>aileron_left_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>-0.70</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>POSITION</type>
+        <p_gain>2.0</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0.02</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.0</cmd_max>
+        <cmd_min>-2.0</cmd_min>
+      </control>
+
+      <!-- ch5: SERVO6 Aileron (right) — roll right = right TE up -->
+      <control channel="5">
+        <jointName>aileron_right_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>0.70</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>POSITION</type>
+        <p_gain>2.0</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0.02</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.0</cmd_max>
+        <cmd_min>-2.0</cmd_min>
+      </control>
+
+      <!-- ch6: SERVO7 Elevator — pitch up = TE up -->
+      <control channel="6">
+        <jointName>elevator_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>0.70</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>POSITION</type>
+        <p_gain>2.0</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0.02</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.0</cmd_max>
+        <cmd_min>-2.0</cmd_min>
+      </control>
+
+      <!-- ch7: SERVO8 Rudder — yaw right = TE right -->
+      <control channel="7">
+        <jointName>rudder_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>0.70</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>POSITION</type>
+        <p_gain>2.0</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0.02</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.0</cmd_max>
+        <cmd_min>-2.0</cmd_min>
       </control>
 
     </plugin>

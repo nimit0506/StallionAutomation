@@ -6,8 +6,9 @@
 # =================================================================
 set -e
 
-STALLION_DIR="/mnt/c/Users/SACHIN/Stallion"
-ARDUPILOT_DIR="${HOME}/ardupilot"
+# Repo root (override with STALLION_DIR=... if needed)
+STALLION_DIR="${STALLION_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+ARDUPILOT_DIR="${ARDUPILOT_DIR:-${HOME}/ardupilot}"
 PARAM_FILE="${STALLION_DIR}/params/stallion_vtol_sitl.parm"
 
 # ─── Verify ArduPilot source exists ────────────────────────────
@@ -26,7 +27,12 @@ fi
 rm -f "${ARDUPILOT_DIR}/mav.parm" ./mav.parm 2>/dev/null
 
 # Windows host IP for Mission Planner UDP connection
-WINDOWS_HOST=$(ip route show default | awk '/default/ {print $3}' | head -1)
+# Windows host IP for Mission Planner (WSL only; plain Linux uses localhost)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    WINDOWS_HOST=$(ip route show default | awk '/default/ {print $3}' | head -1)
+else
+    WINDOWS_HOST=127.0.0.1
+fi
 
 echo ""
 echo "============================================="
