@@ -23,7 +23,7 @@ Q_TAILSIT_ENABLE    0
 Q_TILT_ENABLE       1
 Q_TILT_TYPE         0
 Q_TILT_MASK         3
-Q_TILT_MAX          90
+Q_TILT_MAX          45
 Q_TILT_RATE_UP      40
 Q_TILT_RATE_DN      40
 Q_TILT_YAW_ANGLE    0
@@ -93,8 +93,8 @@ SERVO3_FUNCTION     36
 SERVO4_FUNCTION     41
 SERVO5_FUNCTION     39
 SERVO6_FUNCTION     4
-SERVO7_FUNCTION     19
-SERVO8_FUNCTION     21
+SERVO7_FUNCTION     79
+SERVO8_FUNCTION     80
 
 # Tilt servo: PWM 1000 = hover (vertical), PWM 2000 = cruise (forward)
 SERVO4_MIN          1000
@@ -108,7 +108,7 @@ SERVO5_TRIM         1500
 SERVO5_REVERSED     0
 
 # Baseline Hover Throttle
-Q_M_THST_HOVER      0.42
+Q_M_THST_HOVER      0.55
 
 # ==========================================
 # 9. HOVER PID TUNING

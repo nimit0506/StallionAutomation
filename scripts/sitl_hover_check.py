@@ -15,6 +15,12 @@ import time
 
 from pymavlink import mavutil
 
+PRINT_DT = 1.0
+VERBOSE = False
+CSV = None          # open file when --csv is given
+T0 = time.time()
+PHASE = "init"
+
 
 def wait_heartbeat(m, timeout=60):
     hb = m.wait_heartbeat(timeout=timeout)
@@ -48,9 +54,11 @@ def fly(m, seconds, throttle, log):
             continue
         if msg.get_type() == "SERVO_OUTPUT_RAW":
             log["servo"] = (msg.servo4_raw, msg.servo6_raw, msg.servo7_raw, msg.servo8_raw)
+            log["motors"] = (msg.servo1_raw, msg.servo2_raw, msg.servo3_raw)
             continue
         if msg.get_type() == "VFR_HUD":
             log["gs"] = msg.groundspeed
+            log["aspd"] = msg.airspeed
             continue
         if msg.get_type() == "ATTITUDE":
             log["roll"] = math.degrees(msg.roll)
@@ -60,10 +68,16 @@ def fly(m, seconds, throttle, log):
             log["alt"] = msg.relative_alt / 1000.0
             log["max_alt"] = max(log["max_alt"], log["alt"])
         now = time.time()
-        if now - log["last_print"] > 1.0:
+        if CSV and now - log.get("last_csv", 0) > 0.1:
+            log["last_csv"] = now
+            CSV.write(f"{now - T0:.2f},{PHASE},{log['alt']:.3f},{log['roll']:.2f},{log['pitch']:.2f},"
+                      f"{log['gs']:.2f},{log['aspd']:.2f},{','.join(map(str, log['servo']))},"
+                      f"{','.join(map(str, log['motors']))}\n")
+        if now - log["last_print"] > PRINT_DT:
             log["last_print"] = now
             print(f"  alt={log['alt']:6.2f} m  roll={log['roll']:6.1f}  pitch={log['pitch']:6.1f}  gs={log['gs']:5.1f} m/s  "
-                  f"tilt/ail/elev/rud={log['servo']}")
+                  f"tilt/ail/vtL/vtR={log['servo']}"
+                  + (f"  aspd={log['aspd']:4.1f} mot={log['motors']}" if VERBOSE else ""))
 
 
 def main():
@@ -76,7 +90,15 @@ def main():
     ap.add_argument("--transition", action="store_true",
                     help="after the hover climb, transition to forward flight (FBWB, altitude hold) and check it flies")
     ap.add_argument("--climb-time", type=float, default=10.0)
+    ap.add_argument("--verbose", action="store_true", help="print 4x/s incl. airspeed and motor outputs")
+    ap.add_argument("--csv", help="write a 10 Hz flight log (CSV) for plotting")
     args = ap.parse_args()
+    global PRINT_DT, VERBOSE, CSV, PHASE
+    if args.csv:
+        CSV = open(args.csv, "w", buffering=1)
+        CSV.write("t,phase,alt,roll,pitch,gs,aspd,tilt,ail,vtail_l,vtail_r,m_fr,m_fl,m_rear\n")
+    if args.verbose:
+        PRINT_DT, VERBOSE = 0.25, True
 
     m = mavutil.mavlink_connection(args.connect)
     wait_heartbeat(m)
@@ -100,13 +122,16 @@ def main():
             sys.exit("FAIL: vehicle did not arm")
     print("Armed")
 
-    log = {"alt": 0.0, "roll": 0.0, "pitch": 0.0, "max_alt": 0.0, "max_tilt": 0.0, "gs": 0.0, "servo": (0, 0, 0, 0), "last_print": 0}
+    log = {"alt": 0.0, "roll": 0.0, "pitch": 0.0, "max_alt": 0.0, "max_tilt": 0.0, "gs": 0.0, "servo": (0, 0, 0, 0), "motors": (0, 0, 0), "aspd": 0.0, "last_print": 0}
+    PHASE = "climb"
     print(f"Climbing (throttle {args.climb_throttle})...")
     fly(m, args.climb_time, args.climb_throttle, log)
+    PHASE = "hold"
     print(f"Holding (throttle {args.hold_throttle})...")
     fly(m, 10, args.hold_throttle, log)
 
     if args.transition:
+        PHASE = "forward"
         print("Transition to forward flight (FBWB, throttle 1800)...")
         set_mode(m, "FBWB")
         log["max_tilt"] = 0.0  # judge forward flight on its own
@@ -121,11 +146,16 @@ def main():
         print(f"\nforward flight: max_gs={max_gs:.1f} m/s  min_alt={log['min_alt_fw']:.1f} m  "
               f"max_tilt={log['max_tilt']:.1f} deg  -> {'PASS' if fw_ok else 'FAIL'}")
         print("Back to QHOVER, then QLAND...")
+        PHASE = "back_transition"
         set_mode(m, "QHOVER")
         fly(m, 15, 1500, log)
+        PHASE = "land"
         set_mode(m, "QLAND")
-        fly(m, 20, 1500, log)
-        sys.exit(0 if fw_ok else 1)
+        fly(m, 120, 1500, log)
+        landed = log["alt"] < 0.5
+        print(f"landing: final alt={log['alt']:.2f} m -> {'LANDED' if landed else 'NOT LANDED'}")
+        sys.exit(0 if fw_ok and landed else 1)
+    PHASE = "land"
     print("Landing (QLAND)...")
     set_mode(m, "QLAND")
     fly(m, 15, 1500, log)
