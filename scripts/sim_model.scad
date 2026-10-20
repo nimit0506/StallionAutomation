@@ -1,6 +1,9 @@
 // Stallion V2 (with vial pod) for the sim-image renders.
-// Uses the same visual meshes Gazebo loads (gazebo/models/stallion_vtol/meshes/v2),
-// coloured by group. Rendered by scripts/render_sim_images.sh.
+// Each import is one part of the Gazebo model's visual meshes
+// (gazebo/models/stallion_vtol/meshes/v2), coloured by group.
+// Paths are relative to this file, which is why render_sim_images.sh cds into scripts/.
+// Colours: airframe orange, wings white, carbon black, pod green, electronics red,
+// moving links dark grey/black, control surfaces blue.
 color([1,0.45,0.1])  import("../gazebo/models/stallion_vtol/meshes/v2/airframe.stl");
 color([0.95,0.95,0.95]) import("../gazebo/models/stallion_vtol/meshes/v2/wings.stl");
 color([0.12,0.12,0.12]) import("../gazebo/models/stallion_vtol/meshes/v2/carbon.stl");

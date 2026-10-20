@@ -2,9 +2,16 @@
 """
 build_stallion_v2_model.py — generate the Gazebo model from the Stallion V2 GLB.
 
-    python3 scripts/build_stallion_v2_model.py stallion_v2_pod_repaired.glb
+    python3 scripts/build_stallion_v2_model.py inputs/stallion_v2_pod_repaired.glb
+    python3 scripts/build_stallion_v2_model.py inputs/stallion_v2_pod_repaired.glb --variant nopod
 
-Writes, for both gazebo/models/stallion_vtol and stallion_vtol_2:
+Variants:
+  pod    (default) full aircraft with the vial pod. Writes stallion_vtol (port 9002)
+         and stallion_vtol_2 (port 9012, copy used by the second world airframe).
+  nopod  same aircraft with the vial pod parts removed (mass, CG, inertia, visuals,
+         collision skin all follow). Writes stallion_vtol_nopod (port 9002).
+
+Writes, for each model directory under gazebo/models/:
   meshes/v2/*.stl   visual meshes, one per link/colour group, in link frames
   meshes/v2/collision.stl   whole-aircraft shrink-wrap (closed, low-poly)
   model.sdf         links, joints, aero, ArduPilot plugin
@@ -27,10 +34,21 @@ from mesh_check import load_parts
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODELS = os.path.join(HERE, "..", "gazebo", "models")
 
-BATTERY_SHIFT = 0.057        # m forward of the CAD's provisional spot -> manual CG
-CG_AFT_OF_ROOT_LE = 0.060    # manual
+# Shift of the battery (forward, +x) relative to its CAD position, chosen so the
+# computed CG lands at CG_AFT_OF_ROOT_LE. Used by both variants so the battery
+# position is identical; only the pod's mass changes the CG.
+BATTERY_SHIFT = 0.057        # m
+CG_AFT_OF_ROOT_LE = 0.060    # m, manual value
 
-# link name -> list of CAD part-name prefixes (exact names or "NAME [n]")
+# Which CAD parts each variant removes, and which models it writes.
+# (model directory name, ArduPilot JSON port) pairs.
+VARIANTS = {
+    "pod": {"drop": [], "models": [("stallion_vtol", 9002), ("stallion_vtol_2", 9012)]},
+    "nopod": {"drop": ["VIAL POD"], "models": [("stallion_vtol_nopod", 9002)]},
+}
+
+# Moving links: link name -> CAD part-name prefixes (exact names or "NAME [n]").
+# Every CAD part is used exactly once; the leftover parts go into BASE_GROUPS.
 MOVING = {
     "fl_tilt_link":  ["MOTOR MOUNT FRONT [2]"],
     "fl_motor_link": ["MOTOR LEFT"],
@@ -43,7 +61,7 @@ MOVING = {
     "ruddervator_left":  ["RUDDER 1L", "RUDDER 2L"],
     "ruddervator_right": ["RUDDER 1R", "RUDDER 2R"],
 }
-# base_link visual groups: name -> (colour rgb, predicate)
+# Fixed (non-moving) visual groups on base_link: name -> (colour rgb, predicate on the part name)
 BASE_GROUPS = {
     "airframe": ((1.0, 0.45, 0.1), lambda n: not any(k in n for k in
                  ["WING", "V TAIL", "CARBON", "VIAL", "SERVO -", "SERVO RIGHT", "SERVO LEFT",
@@ -54,11 +72,16 @@ BASE_GROUPS = {
     "electronics": ((0.85, 0.15, 0.15), lambda n: any(k in n for k in
                     ["SERVO -", "SERVO RIGHT", "SERVO LEFT", "FC -", "RX -", "BATTERY -", "USB"])),
 }
+# Colour used for each link kind in the Gazebo view
 LINK_COLOUR = {"motor": (0.1, 0.1, 0.1), "tilt": (0.3, 0.3, 0.3), "surface": (0.25, 0.55, 0.95)}
 
 
 def match(parts, prefixes):
-    """CAD names are either exact ("AILERON 1L") or "PREFIX - catalogue name"."""
+    """Return the CAD part names for a list of prefixes.
+
+    CAD names are either exact ("AILERON 1L") or "PREFIX - catalogue name".
+    Raises KeyError if a prefix matches nothing, so a renamed part fails loudly.
+    """
     out = []
     for p in prefixes:
         hits = [n for n in parts if n == p or n.startswith(p + " -")]
@@ -74,12 +97,12 @@ def simplify_part(m, tol):
     from mesh_check import check
     try:
         man = manifold3d.Manifold(manifold3d.Mesh(m.vertices.astype(np.float32), m.faces.astype(np.uint32)))
-        o = man.simplify(tol).to_mesh()
+        o = man.simplify(tol).to_mesh()          # reduce faces, keep the solid closed
         out = clean_degenerate(trimesh.Trimesh(o.vert_properties[:, :3], o.tri_verts))
         if check(out)["clean"] and len(out.faces) > 0:
             return out
     except Exception:
-        pass
+        pass                                     # if simplification fails, keep the full part
     return m
 
 
@@ -105,14 +128,19 @@ def group_mesh(parts, names, tol):
 
 
 def hinge(meshes, flip=False):
-    """Hinge = forward edge of a control surface, axis = its span direction."""
+    """Hinge of a control surface: returns (position, axis).
+
+    Position = the forward edge of the surface (90th percentile in x), at the
+    surface's mid-span and mid-height. Axis = the span direction, taken as the
+    principal component (largest variance) of the vertices.
+    """
     v = np.vstack([m.vertices for m in meshes])
     c = v.mean(0)
-    w, U = np.linalg.eigh((v - c).T @ (v - c))
-    axis = U[:, -1] / np.linalg.norm(U[:, -1])
+    w, U = np.linalg.eigh((v - c).T @ (v - c))   # eigenvectors of the covariance
+    axis = U[:, -1] / np.linalg.norm(U[:, -1])   # largest-variance direction = span
     if axis[1] < 0:            # point spanwise toward +y ...
         axis = -axis
-    if flip:                   # ... except right V-tail panel (keeps +angle = TE up)
+    if flip:                   # ... except where a flip is asked for (unused: all four are False)
         axis = -axis
     front = v[v[:, 0] > np.percentile(v[:, 0], 90)].mean(0)
     pos = np.array([front[0], c[1], c[2]])
@@ -120,15 +148,19 @@ def hinge(meshes, flip=False):
 
 
 def shrink_wrap_points(mesh_list, pitch, tol=0.001):
-    """Closed outer skin: rasterise surface samples, close gaps, fill, thicken by one
-    voxel (so thin plates stay manifold), marching cubes, then manifold-preserving
-    simplification. Result is watertight with no non-manifold edges."""
+    """Closed outer skin around several meshes.
+
+    Steps: sample surface points -> voxelise at `pitch` -> close gaps -> fill holes ->
+    thicken by one voxel (so thin plates stay manifold) -> keep the largest piece ->
+    marching cubes -> manifold-preserving simplification. Result is watertight with no
+    non-manifold edges.
+    """
     import manifold3d
     from scipy import ndimage
     from skimage import measure
     pts = np.vstack([m.sample(max(2000, int(m.area / pitch**2 * 4)), seed=0) for m in mesh_list])
-    lo = pts.min(0) - 3 * pitch
-    idx = np.floor((pts - lo) / pitch).astype(int)
+    lo = pts.min(0) - 3 * pitch                     # grid origin, with a margin
+    idx = np.floor((pts - lo) / pitch).astype(int)  # voxel index of each sample
     grid = np.zeros(idx.max(0) + 4, bool)
     grid[tuple(idx.T)] = True
     grid = ndimage.binary_closing(grid, iterations=1)
@@ -136,9 +168,10 @@ def shrink_wrap_points(mesh_list, pitch, tol=0.001):
     grid = ndimage.binary_dilation(grid, iterations=1)
     grid = ndimage.binary_opening(grid, structure=np.ones((2, 2, 2)))   # drop edge-only voxel contacts
     labels, n = ndimage.label(grid)
+    # keep only the largest connected blob
     grid = labels == (np.argmax(ndimage.sum(grid, labels, range(1, n + 1))) + 1)
     v, f, _, _ = measure.marching_cubes(np.pad(grid, 1).astype(np.uint8), 0.5)
-    skin = trimesh.Trimesh((v - 1) * pitch + lo, f)
+    skin = trimesh.Trimesh((v - 1) * pitch + lo, f)  # back to metres
     skin.merge_vertices()
     if skin.volume < 0:
         skin.invert()
@@ -154,10 +187,12 @@ def shrink_wrap_points(mesh_list, pitch, tol=0.001):
 
 
 def f3(v):
+    """Format a vector as a space-separated string for SDF."""
     return " ".join(f"{x:.4f}" for x in v)
 
 
 def visual(name, uri, rgb):
+    """SDF <visual> block: a mesh with a flat colour."""
     r, g, b = rgb
     return f"""      <visual name="{name}">
         <geometry><mesh><uri>{uri}</uri></mesh></geometry>
@@ -167,6 +202,7 @@ def visual(name, uri, rgb):
 
 
 def inertial(mass, i=(1e-5, 1e-5, 1e-5), pose="0 0 0 0 0 0", ixz=0.0):
+    """SDF <inertial> block: mass, principal inertias, and the pose of the centre of mass."""
     return f"""      <inertial>
         <pose>{pose}</pose>
         <mass>{mass:.4f}</mass>
@@ -176,6 +212,7 @@ def inertial(mass, i=(1e-5, 1e-5, 1e-5), pose="0 0 0 0 0 0", ixz=0.0):
 
 
 def joint(name, parent, child, pos, axis, lower, upper, damping=0.01):
+    """SDF revolute joint. pos is relative to the parent link, axis is in the joint frame."""
     return f"""    <joint name="{name}" type="revolute">
       <pose relative_to="{parent}">{f3(pos)} 0 0 0</pose>
       <parent>{parent}</parent>
@@ -191,6 +228,12 @@ def joint(name, parent, child, pos, axis, lower, upper, damping=0.01):
 
 def liftdrag(comment, link, cp, area, upward, a0, cla, cda, stall, cj=None, rad_to_cl=0.0,
              forward=(1, 0, 0), cla_stall=-2.0, cda_stall=1.0):
+    """SDF block for one Gazebo LiftDrag aerodynamic element.
+
+    cp: centre of pressure on the link; area: m2; upward: lift direction.
+    a0 / cla: zero-lift angle and lift slope; cda: drag; stall: stall angle.
+    cj / rad_to_cl: optional control joint whose angle adds lift (control surfaces).
+    """
     ctrl = (f"\n      <control_joint_name>{cj}</control_joint_name>"
             f"\n      <control_joint_rad_to_cl>{rad_to_cl}</control_joint_rad_to_cl>") if cj else ""
     return f"""    <!-- {comment} -->
@@ -210,7 +253,11 @@ PROP_R, PROP_A0, PROP_CLA, PROP_AREA, MOTOR_OMEGA_MAX = 0.0667, 0.28, 5.0, 0.000
 
 
 def prop_liftdrag(link, sign):
-    """Two blade elements per prop."""
+    """Two blade elements per prop (at +R and -R), each a LiftDrag element on the motor link.
+
+    The air a blade sees comes from the link spinning, so thrust grows with the spin speed.
+    sign sets the direction of the in-plane flow for the spin direction of this motor.
+    """
     out = ""
     for cp, fwd in ((PROP_R, -sign), (-PROP_R, sign)):
         out += f"""    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
@@ -225,6 +272,11 @@ def prop_liftdrag(link, sign):
 
 
 def control(ch, joint_name, kind, mult, offset=-0.5, gains=None):
+    """SDF <control> block: maps one JSON PWM channel onto one joint.
+
+    kind VELOCITY: motor spin, command = (pwm-1000)/1000 + offset, times mult (rad/s).
+    kind POSITION: joint angle, same normalisation, PD gains from `gains` (p, d, cmax).
+    """
     if kind == "VELOCITY":
         g = """        <type>VELOCITY</type>
         <p_gain>0.20</p_gain><i_gain>0</i_gain><d_gain>0</d_gain><i_max>0</i_max><i_min>0</i_min>
@@ -247,28 +299,37 @@ def control(ch, joint_name, kind, mult, offset=-0.5, gains=None):
 """
 
 
-def build(glb):
+def build(glb, variant="pod"):
+    """Build all meshes and SDF files for one variant. See the module docstring."""
+    drop = VARIANTS[variant]["drop"]
     parts = load_parts(glb)
+    parts = {n: m for n, m in parts.items() if not any(d in n for d in drop)}
     for m in parts.values():
-        m.apply_transform(GLTF_TO_FLU)
+        m.apply_transform(GLTF_TO_FLU)           # glTF -> FLU
     root_le_x = parts["WING ROOT L"].bounds[1, 0]
-    mp = compute(glb, 1.0, BATTERY_SHIFT)
+    mp = compute(glb, 1.0, BATTERY_SHIFT, drop)  # mass, CG, inertia for this variant
+    # Model origin = the manual's CG position (x) at the CG height (z), on the centre line (y)
     origin = np.array([root_le_x - CG_AFT_OF_ROOT_LE, 0.0, mp["cg_flu_m"][2]])
     for n, m in parts.items():
-        m.apply_translation(-origin)
+        m.apply_translation(-origin)             # move everything so the origin is the CG target
         if n.startswith("BATTERY -"):
             m.apply_translation([BATTERY_SHIFT, 0, 0])
+    # Where the real centre of mass sits relative to the origin. For the pod variant this is
+    # about zero; without the pod it moves, and the SDF needs it to get the dynamics right.
+    cg_offset = np.array(mp["cg_flu_m"]) - origin
 
     # ---------- joints from CAD ----------
     def centre(prefixes):
+        """Centre of the bounding box of the named parts."""
         return trimesh.util.concatenate([parts[n] for n in match(parts, prefixes)]).bounds.mean(0)
 
     j = {}
+    # Front motors: tilt pivot is at the motor's x/y, 6 mm above the mount's lowest point
     for side, mount, motor in (("fl", "MOTOR MOUNT FRONT [2]", "MOTOR LEFT"), ("fr", "MOTOR MOUNT FRONT", "MOTOR RIGHT")):
         mb = trimesh.util.concatenate([parts[n] for n in match(parts, [mount])]).bounds
         mc = centre([motor])
         j[f"{side}_tilt"] = np.array([mc[0], mc[1], mb[0, 2] + 0.006])     # pivot near mount base
-        j[f"{side}_motor"] = mc
+        j[f"{side}_motor"] = mc                                             # motor spin axis
     tb = trimesh.util.concatenate([parts[n] for n in match(parts, ["MOTOR MOUNT TAIL"])]).bounds
     j["rear_yaw"] = np.array([centre(["MOTOR TAIL"])[0], 0.0, tb.mean(0)[2]])
     j["rear_motor"] = centre(["MOTOR TAIL"])
@@ -286,32 +347,38 @@ def build(glb):
     # ---------- meshes ----------
     used = set()
     meshes = {}
+    # moving links: each gets its own mesh, re-centred on its joint
     for link, prefixes in MOVING.items():
         names = match(parts, prefixes)
         used.update(names)
         m, _ = group_mesh(parts, names, 0.0002)
         m.apply_translation(-link_origin[link])
         meshes[link] = m
+    # fixed parts: one mesh per colour group; empty groups (e.g. pod without the pod) are skipped
     for g, (_, pred) in BASE_GROUPS.items():
         names = [n for n in parts if n not in used and pred(n)]
+        if not names:
+            continue
         used.update(names)
         meshes[g], _ = group_mesh(parts, names, 0.0002)
     left = [n for n in parts if n not in used]
-    assert not left, left
+    assert not left, left                        # every part must end up in some mesh
 
     # whole-aircraft shrink-wrap for collision
     meshes["collision"] = shrink_wrap_points(list(parts.values()), pitch=0.008, tol=0.0015)
     skin = meshes["collision"]
-    lowest_z = skin.bounds[0, 2]
+    lowest_z = skin.bounds[0, 2]                 # lowest point of the skin -> sits on the ground
 
     # ---------- SDF ----------
     def sdf(model_name, port):
+        """Return the complete model.sdf text for one model directory."""
         uri = lambda n: f"model://{model_name}/meshes/v2/{n}.stl"
-        base_vis = "".join(visual(g, uri(g), c) for g, (c, _) in BASE_GROUPS.items())
+        base_vis = "".join(visual(g, uri(g), c) for g, (c, _) in BASE_GROUPS.items() if g in meshes)
         I = np.array(mp["inertia_about_cg"])
         moving_mass = 0.0
         links = ""
         J = ""
+        # (link, parent, joint, axis, lower, upper, damping, kind, guessed mass kg)
         spec = [
             ("fl_tilt_link", "base_link", "fl_tilt_joint", (0, 1, 0), 0.0, 1.5708, 0.05, "tilt", 0.03),
             ("fl_motor_link", "fl_tilt_link", "fl_motor_joint", (0, 0, 1), -1e16, 1e16, 0.0001, "motor", 0.06),
@@ -321,11 +388,13 @@ def build(glb):
             ("rear_motor_link", "rear_yaw_link", "rear_motor_joint", (0, 0, 1), -1e16, 1e16, 0.0001, "motor", 0.06),
         ]
         for link, parent, jn, axis, lo, hi, damp, kind, mass in spec:
+            # joint position relative to the parent link (base_link is the frame origin)
             rel = link_origin[link] - (link_origin[parent] if parent != "base_link" else 0)
             J += joint(jn, parent, link, rel, axis, lo, hi, damp)
             moving_mass += mass
             prop = ""
             if kind == "motor":
+                # transparent disc showing the prop
                 prop = """      <visual name="prop">
         <pose>0 0 0.025 0 0 0</pose>
         <geometry><cylinder><radius>0.089</radius><length>0.002</length></cylinder></geometry>
@@ -338,6 +407,7 @@ def build(glb):
       <pose relative_to="{jn}">0 0 0 0 0 0</pose>
 {inertial(mass, ii)}{visual(link + "_visual", uri(link), LINK_COLOUR[kind])}{prop}    </link>
 """
+        # control surfaces: revolute joints on base_link with their own small mass
         for link, (pos, axis) in surf.items():
             jn = link + "_joint"
             J += joint(jn, "base_link", link, pos, axis, -0.4, 0.4)
@@ -345,11 +415,13 @@ def build(glb):
       <pose relative_to="{jn}">0 0 0 0 0 0</pose>
 {inertial(0.01)}{visual(link + "_visual", uri(link), LINK_COLOUR["surface"])}    </link>
 """
+        # base_link takes whatever mass is left after the guessed moving parts (0.04 kg = surfaces)
         base_mass = mp["mass_kg"] - moving_mass - 0.04
 
         # ---- aero (manual: S=0.265 m2, MAC 0.211, E205, AR 5.6) ----
         # 3D lift slope 4.3/rad, zero-lift offset 0.063 rad (E205 Cl0 ~0.27)
         aero = ""
+        # wing: three spanwise elements per side (centre, inboard, outboard with aileron)
         aero += liftdrag("Wing centre section (under fuselage)", "base_link", (0.0, 0, 0.02), 0.068,
                          (0, 0, 1), 0.063, 4.3, 0.13, 0.19)
         for s, y in (("left", 1), ("right", -1)):
@@ -365,9 +437,11 @@ def build(glb):
                              n, 0.0, 3.0, 0.10, 0.30, cj=f"ruddervator_{s}_joint", rad_to_cl=-1.5)
         # Parasite drag (fuselage, pod, booms, motors): LiftDrag drag is ~cda*|alpha|,
         # so a no-lift element with a0 = 1 rad gives a near-constant CdA = 0.054*0.20.
+        # The pod is not separately modelled here, so this value is the same for both variants.
         aero += liftdrag("Parasite drag: frontal area 5.4 dm2 x Cd 0.20 (no lift)", "base_link", (0, 0, 0),
                          0.054, (0, 0, 1), 1.0, 0.0, 0.20, 10.0, cla_stall=0.0, cda_stall=0.0)
 
+        # ArduPilot JSON bridge: exchanges sensor and servo packets with SITL on `port`
         ap = f"""    <plugin name="ArduPilotPlugin" filename="libArduPilotPlugin.so">
       <fdm_addr>127.0.0.1</fdm_addr>
       <fdm_port_in>{port}</fdm_port_in>
@@ -388,7 +462,7 @@ def build(glb):
         return f"""<?xml version="1.0"?>
 <sdf version="1.9">
   <!--
-    Flightory Stallion V2 VTOL (with vial pod) — GENERATED by scripts/build_stallion_v2_model.py
+    Flightory Stallion V2 VTOL ({variant}) — GENERATED by scripts/build_stallion_v2_model.py
     from the repaired CAD (GLB). Do not hand-edit: change the script and re-run.
     Origin = CG target (manual: 60 mm aft of wing-root LE). AUW {mp['mass_kg']*1000:.0f} g (estimate).
     Battery assumed {BATTERY_SHIFT*1000:.0f} mm forward of the CAD's provisional position to hit that CG.
@@ -397,7 +471,7 @@ def build(glb):
     <self_collide>false</self_collide>
     <link name="base_link">
       <pose>0 0 {-lowest_z + 0.002:.4f} 0 0 0</pose>
-{inertial(base_mass, (I[0,0], I[1,1], I[2,2]), f"{f3([0, 0, 0])} 0 0 0", ixz=I[0,2])}      <collision name="shrinkwrap_collision">
+{inertial(base_mass, (I[0,0], I[1,1], I[2,2]), f"{f3(cg_offset)} 0 0 0", ixz=I[0,2])}      <collision name="shrinkwrap_collision">
         <geometry><mesh><uri>{uri("collision")}</uri></mesh></geometry>
         <surface><friction><ode><mu>0.8</mu><mu2>0.8</mu2></ode></friction></surface>
       </collision>
@@ -415,7 +489,7 @@ def build(glb):
 </sdf>
 """
 
-    for model_name, port in (("stallion_vtol", 9002), ("stallion_vtol_2", 9012)):
+    for model_name, port in VARIANTS[variant]["models"]:
         d = os.path.join(MODELS, model_name, "meshes", "v2")
         os.makedirs(d, exist_ok=True)
         for n, m in meshes.items():
@@ -423,7 +497,8 @@ def build(glb):
         with open(os.path.join(MODELS, model_name, "model.sdf"), "w") as f:
             f.write(sdf(model_name, port))
         print(f"wrote {model_name}: {len(meshes)} meshes, "
-              f"{sum(len(m.faces) for m in meshes.values())} faces")
+              f"{sum(len(m.faces) for m in meshes.values())} faces, AUW {mp['mass_kg']*1000:.0f} g, "
+              f"CG offset from origin {np.round(cg_offset * 1000, 1).tolist()} mm")
     print("joints:", {k: np.round(v, 3).tolist() for k, v in link_origin.items()})
     print("surface axes:", {k: np.round(v[1], 3).tolist() for k, v in surf.items()})
 
@@ -431,4 +506,6 @@ def build(glb):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("glb")
-    build(ap.parse_args().glb)
+    ap.add_argument("--variant", choices=sorted(VARIANTS), default="pod")
+    args = ap.parse_args()
+    build(args.glb, args.variant)

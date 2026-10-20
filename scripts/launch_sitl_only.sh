@@ -57,6 +57,14 @@ cd "${ARDUPILOT_DIR}"
 
 # -f JSON tells SITL to use Gazebo's JSON FDM physics backend
 # -w wipes eeprom (add -w flag below on FIRST RUN to force param reload)
+# sim_vehicle.py starts ArduPlane SITL and MAVProxy together:
+#   -v ArduPlane            the vehicle type (ArduPlane firmware, which includes QuadPlane)
+#   -f JSON                 physics comes from Gazebo over JSON (not the built-in simulator)
+#   -w                      wipe the EEPROM so the parameter file is loaded fresh
+#   --custom-location       Chennai home position and heading (lat, lon, alt, heading)
+#   --add-param-file        the Stallion parameters, loaded on top of the defaults
+#   --out                   send telemetry to Mission Planner (WINDOWS_HOST) and to localhost
+#   --console / --map       open the MAVProxy console and the map window
 python3 Tools/autotest/sim_vehicle.py \
     -v ArduPlane \
     -f JSON \

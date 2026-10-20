@@ -21,6 +21,8 @@ if [ ! -f "${ARDUPILOT_GZ_BUILD}/libArduPilotPlugin.so" ]; then
 fi
 
 # ─── Gazebo Environment ────────────────────────────────────────
+# Gazebo loads system plugins (libArduPilotPlugin.so) from GZ_SIM_SYSTEM_PLUGIN_PATH,
+# and finds models (model://stallion_vtol) and worlds in GZ_SIM_RESOURCE_PATH.
 export GZ_SIM_SYSTEM_PLUGIN_PATH="${ARDUPILOT_GZ_BUILD}:${GZ_SIM_SYSTEM_PLUGIN_PATH}"
 export LD_LIBRARY_PATH="${ARDUPILOT_GZ_BUILD}:${LD_LIBRARY_PATH}"
 export GZ_SIM_RESOURCE_PATH="${STALLION_DIR}/gazebo/models:${STALLION_DIR}/gazebo/worlds:${ARDUPILOT_GZ_DIR}/models:${GZ_SIM_RESOURCE_PATH}"
