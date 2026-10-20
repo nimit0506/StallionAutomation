@@ -89,16 +89,11 @@
       </link>
     </model>
 
-    <!-- Spawn Stallion VTOL Drone 1 (SYSID=1) — Left side of runway (Y = -2.5m) -->
+    <!-- Spawn Stallion VTOL Drone 1 (SYSID=1) — Left side of runway (Y = -2.5m).
+         Only one airframe: a second idle airframe halved the simulation speed. -->
     <include>
       <uri>model://stallion_vtol</uri>
       <pose>0 -2.5 0.08 0 0 0</pose>
-    </include>
-
-    <!-- Spawn Stallion VTOL Drone 2 (SYSID=2) — Right side of runway (Y = +2.5m) -->
-    <include>
-      <uri>model://stallion_vtol_2</uri>
-      <pose>0 2.5 0.08 0 0 0</pose>
     </include>
 
   </world>
