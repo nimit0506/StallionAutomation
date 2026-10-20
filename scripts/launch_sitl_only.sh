@@ -1,17 +1,36 @@
 #!/usr/bin/env bash
-# =================================================================
-#  launch_sitl_only.sh — TERMINAL 2
-#  Starts ArduPlane SITL connected to Gazebo via JSON FDM
-#  Run this AFTER Gazebo is already running (launch_gazebo_only.sh)
-# =================================================================
-set -e
+# ============================================================================
+# launch_sitl_only.sh  —  TERMINAL 2 of the manual (GUI) setup
+# ============================================================================
+#
+# WHAT THIS FILE DOES (plain language)
+#   Starts the ArduPlane autopilot in software (SITL), connected to the Gazebo
+#   window started by launch_gazebo_only.sh. It also starts MAVProxy, a console
+#   where you can type commands (arm, mode, rc) to fly the aircraft by hand.
+#   Gazebo must already be running.
+#
+# KEY WORDS
+#   SITL     : Software In The Loop: the real autopilot code on this computer.
+#   JSON     : the link that gives the autopilot the physics from Gazebo.
+#   MAVProxy : a ground-station console; it relays messages between the autopilot
+#              and other programs (such as Mission Planner on Windows).
+#   Mission Planner : a Windows ground-station program that can connect over UDP.
+#
+# HOW TO RUN IT
+#   bash scripts/launch_sitl_only.sh
+#   In the MAVProxy console:  mode QHOVER   then   arm throttle   then   rc 3 1600
+#
+# Override the folders with environment variables if your install is elsewhere:
+#   STALLION_DIR, ARDUPILOT_DIR
+# ============================================================================
+set -e                      # stop at the first error
 
-# Repo root (override with STALLION_DIR=... if needed)
+# Repo root: the folder above this script. ArduPilot source: default ~/ardupilot.
 STALLION_DIR="${STALLION_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 ARDUPILOT_DIR="${ARDUPILOT_DIR:-${HOME}/ardupilot}"
-PARAM_FILE="${STALLION_DIR}/params/stallion_vtol_sitl.parm"
+PARAM_FILE="${STALLION_DIR}/params/stallion_vtol_sitl.parm"   # the Stallion parameters
 
-# ─── Verify ArduPilot source exists ────────────────────────────
+# ─── Check that ArduPilot and the parameter file exist ─────────────────────────
 if [ ! -d "${ARDUPILOT_DIR}" ]; then
     echo "!!! ERROR: ArduPilot source not found at ${ARDUPILOT_DIR}"
     echo "    Clone with: git clone https://github.com/ArduPilot/ardupilot.git"
@@ -23,11 +42,11 @@ if [ ! -f "${PARAM_FILE}" ]; then
     exit 1
 fi
 
-# Delete stale param cache to force fresh load
+# Delete the saved parameter cache so the new parameter file is loaded fresh
 rm -f "${ARDUPILOT_DIR}/mav.parm" ./mav.parm 2>/dev/null
 
-# Windows host IP for Mission Planner UDP connection
-# Windows host IP for Mission Planner (WSL only; plain Linux uses localhost)
+# The address of the Windows computer, for Mission Planner (only meaningful under WSL).
+# On plain Linux we use localhost (127.0.0.1), which is this computer.
 if grep -qi microsoft /proc/version 2>/dev/null; then
     WINDOWS_HOST=$(ip route show default | awk '/default/ {print $3}' | head -1)
 else
@@ -55,8 +74,6 @@ echo ""
 
 cd "${ARDUPILOT_DIR}"
 
-# -f JSON tells SITL to use Gazebo's JSON FDM physics backend
-# -w wipes eeprom (add -w flag below on FIRST RUN to force param reload)
 # sim_vehicle.py starts ArduPlane SITL and MAVProxy together:
 #   -v ArduPlane            the vehicle type (ArduPlane firmware, which includes QuadPlane)
 #   -f JSON                 physics comes from Gazebo over JSON (not the built-in simulator)

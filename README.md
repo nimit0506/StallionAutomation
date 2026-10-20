@@ -1,5 +1,20 @@
 # Stallion V2 VTOL — Gazebo + ArduPlane SITL
 
+## New to this project? Read in this order
+
+Every script starts with a plain-language header that explains what it does,
+the key words it uses, and how to run it. Read them in this order:
+
+1. `docs/CODE_GUIDE.md`: the whole project in one document.
+2. `scripts/mesh_check.py`: what "a valid 3D solid" means.
+3. `scripts/mesh_repair.py`: how broken parts are fixed.
+4. `scripts/mass_properties.py`: mass, balance point (CG) and rotation inertia.
+5. `scripts/build_stallion_v2_model.py`: turns the CAD into the Gazebo model (the biggest file).
+6. `scripts/run_headless_test.sh` and `scripts/sitl_hover_check.py`: running and grading a flight.
+7. `scripts/flight_metrics.py`: turning the flight logs into numbers and charts.
+8. `scripts/gazebo_render_views.py` and `scripts/build_variant_deck.js`: pictures and slides.
+
+
 Simulation of the Stallion V2 quad-tilt tricopter VTOL (with vial pod). The airframe
 comes from the repaired CAD export in `inputs/`. Gazebo Harmonic runs the physics, and
 ArduPlane SITL (QuadPlane, tilt-rotor settings) flies it through the JSON bridge.
@@ -76,7 +91,11 @@ python3 scripts/flight_metrics.py results/variants --out results/metrics
 # 7. Slides (needs pptxgenjs: npm install pptxgenjs, then node scripts/build_variant_deck.js)
 node scripts/build_variant_deck.js
 
-# 8. Sim images
+# 8. Gazebo pictures of both airframes (grey background, five views each)
+xvfb-run -a python3 scripts/gazebo_render_views.py stallion_vtol results/images/gazebo/pod
+xvfb-run -a python3 scripts/gazebo_render_views.py stallion_vtol_nopod results/images/gazebo/nopod
+
+# 9. OpenSCAD pictures (simpler, not from Gazebo)
 xvfb-run -a scripts/render_sim_images.sh      # or plain: scripts/render_sim_images.sh
 ```
 

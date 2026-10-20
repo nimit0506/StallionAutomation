@@ -1,52 +1,87 @@
-// build_variant_deck.js — builds the with-pod vs without-pod flight dynamics deck.
+// ============================================================================
+// build_variant_deck.js — writes the PowerPoint slides comparing the aircraft
+//                         with and without the vial pod.
+// ============================================================================
 //
-//   NODE_PATH=<folder with pptxgenjs>/node_modules node scripts/build_variant_deck.js
+// WHAT THIS FILE DOES (plain language)
+//   It writes a .pptx file (a PowerPoint presentation). It does NOT draw the
+//   charts or run the simulation: it only reads the results that the other
+//   scripts already produced, and places them on slides as text, tables and
+//   pictures. If you re-run the flights, run flight_metrics.py first, then this
+//   file, and the slides update.
 //
-// Every number comes from results/metrics/metrics.json and results/mesh/mass*.json.
-// Every picture comes from results/images/gazebo (Gazebo's own renders) and
-// results/metrics/charts (time-series charts from scripts/flight_metrics.py).
-// Output: docs/Stallion_V2_Pod_vs_NoPod_Flight_Dynamics.pptx
-const path = require("path");
-const fs = require("fs");
-const pptxgen = require("pptxgenjs");
+// WHERE THE NUMBERS COME FROM
+//   results/metrics/metrics.json   per-phase flight numbers (from flight_metrics.py)
+//   results/mesh/mass.json         mass and inertia, with the pod   (from mass_properties.py)
+//   results/mesh/mass_nopod.json   mass and inertia, without the pod
+//   results/images/gazebo/...      renders from Gazebo's cameras  (gazebo_render_views.py)
+//   results/metrics/charts/...     time-series charts              (flight_metrics.py)
+//
+// HOW TO RUN IT
+//   1. Install the library once:   npm install pptxgenjs   (in any folder)
+//   2. Run, pointing NODE_PATH at that folder's node_modules:
+//        NODE_PATH=/path/to/node_modules node scripts/build_variant_deck.js
+//   Output: docs/Stallion_V2_Pod_vs_NoPod_Flight_Dynamics.pptx
+//
+// READING THE LAYOUT CODE
+//   pptxgenjs positions everything in INCHES. A 16:9 slide is 10 x 5.625 inches.
+//   x = distance from the left edge, y = distance from the top edge.
+//   "w" and "h" are the width and height of the box.
+// ============================================================================
 
+const path = require("path");                // builds file paths that work on any operating system
+const fs = require("fs");                    // reads the JSON result files from disk
+const pptxgen = require("pptxgenjs");        // the library that writes the .pptx file
+
+// ROOT = the repository folder (one level up from this scripts/ folder)
 const ROOT = path.join(__dirname, "..");
+// R("a/b.txt") returns the full path to a file inside the repository
 const R = (p) => path.join(ROOT, p);
-const M = JSON.parse(fs.readFileSync(R("results/metrics/metrics.json")));
-const MASS = JSON.parse(fs.readFileSync(R("results/mesh/mass.json")));
-const MASS_NP = JSON.parse(fs.readFileSync(R("results/mesh/mass_nopod.json")));
+// JSON.parse turns the text of a .json file into a JavaScript object we can read
+const M = JSON.parse(fs.readFileSync(R("results/metrics/metrics.json")));     // flight numbers
+const MASS = JSON.parse(fs.readFileSync(R("results/mesh/mass.json")));        // mass, with pod
+const MASS_NP = JSON.parse(fs.readFileSync(R("results/mesh/mass_nopod.json")));  // mass, no pod
+// Shortcuts: P = the with-pod numbers, N = the without-pod numbers.
+// Each has the structure P.hover.hold.alt_mean_m, P.transition.forward.gs_mean_steady_ms, etc.
 const P = M.pod;     // with pod
 const N = M.nopod;   // without pod
 
-// Colours: with pod = blue, without pod = amber, text = near-black, labels = grey
+// Colours, written as hex codes (no # sign). Blue = with pod, amber = without pod.
 const C = {
   navy: "1B2A41", pod: "1F5F99", nopod: "D9822B", ink: "1E1E1E", muted: "5F6B7A",
   line: "D5DBE3", panel: "F3F5F8", white: "FFFFFF",
 };
-const FONT = "Calibri";
+const FONT = "Calibri";                             // a font that every PowerPoint has
+// Path to the Gazebo render of one view (view = iso, top, side, front or rear)
 const IMG = (v, view) => R(`results/images/gazebo/${v}/${view}.png`);
+// Path to a time-series chart PNG
 const CH = (name) => R(`results/metrics/charts/${name}.png`);
 
-const pres = new pptxgen();
-pres.layout = "LAYOUT_16x9";          // 10 x 5.625 in
-pres.title = "Stallion V2: with and without the vial pod";
+const pres = new pptxgen();                          // a new, empty presentation
+pres.layout = "LAYOUT_16x9";          // 10 x 5.625 in (the standard widescreen slide)
+pres.title = "Stallion V2: with and without the vial pod";   // stored in the file's properties
 
 // Helpers ------------------------------------------------------------------------
+// f(value, decimals) formats a number with fixed decimals; prints "n/a" if missing
 const f = (v, d = 2) => (v === null || v === undefined ? "n/a" : Number(v).toFixed(d));
-let pageNo = 0;
+let pageNo = 0;                                      // counts slides for the footer numbers
 
+// Adds a bold title at the top of a slide, and an optional grey subtitle under it
 function title(slide, text, sub) {
   slide.addText(text, { x: 0.5, y: 0.3, w: 9, h: 0.6, fontFace: FONT, fontSize: 26, bold: true, color: C.navy, margin: 0, isTextBox: true });
   if (sub) slide.addText(sub, { x: 0.5, y: 0.9, w: 9, h: 0.35, fontFace: FONT, fontSize: 14, color: C.muted, margin: 0, isTextBox: true });
 }
 
+// Adds the small grey line at the bottom of a slide, with the slide number
 function footer(slide) {
-  pageNo += 1;
+  pageNo += 1;                                       // each slide that calls footer() gets the next number
   slide.addText(`Gazebo Harmonic + ArduPlane SITL, 10 Hz flight logs   |   ${pageNo}`, {
     x: 0.5, y: 5.25, w: 9, h: 0.25, fontFace: FONT, fontSize: 10, color: C.muted, margin: 0, isTextBox: true,
   });
 }
 
+// Adds a bulleted list. items = array of strings; box = {x, y, w, h} in inches; size = font size.
+// The last item must not have a line break after it (breakLine), which is why we check i < length-1.
 function bullets(slide, items, box, size = 14) {
   slide.addText(items.map((t, i) => ({
     text: t,
@@ -54,6 +89,9 @@ function bullets(slide, items, box, size = 14) {
   })), { ...box, fontFace: FONT, fontSize: size, color: C.ink, paraSpaceAfter: 6, valign: "top", margin: 0, isTextBox: true });
 }
 
+// Adds a table. header = array of column titles; rows = array of rows (each an array of strings).
+// The first column is left-aligned, the others centred. Rows alternate white and light grey.
+// opts: x, y, w (position and width in inches), colW (column widths), rowH (row height), fontSize.
 function table(slide, header, rows, opts = {}) {
   const hdr = header.map((t) => ({ text: t, options: { bold: true, color: C.white, fill: { color: C.navy }, align: "center" } }));
   const body = rows.map((r, i) => r.map((t, j) => ({
@@ -67,19 +105,25 @@ function table(slide, header, rows, opts = {}) {
   });
 }
 
+// Adds a "stat card": a grey box with one big number (value) and a short caption (label) below it.
 function stat(slide, x, y, value, label, colour) {
   slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 2.1, h: 1.55, fill: { color: C.panel }, line: { color: C.panel } });
   slide.addText(value, { x: x + 0.15, y: y + 0.15, w: 1.8, h: 0.6, fontFace: FONT, fontSize: 28, bold: true, color: colour, margin: 0, isTextBox: true });
   slide.addText(label, { x: x + 0.15, y: y + 0.8, w: 1.8, h: 0.7, fontFace: FONT, fontSize: 12, color: C.ink, margin: 0, valign: "top", isTextBox: true });
 }
 
-// Numbers used in the text
+// Numbers used in several slides. The mass files store kg, so multiply by 1000 for grams.
 const massPod = MASS.mass_kg * 1000, massNp = MASS_NP.mass_kg * 1000;
+// dMass = how many grams the pod weighs (about 150)
 const dMass = massPod - massNp;
 const landPeak = Math.max(P.transition.land.max_abs_roll_deg, P.transition.land.max_abs_pitch_deg,
   N.transition.land.max_abs_roll_deg, N.transition.land.max_abs_pitch_deg);
 
-// 1. Title ------------------------------------------------------------------------
+// ============================================================================
+// SLIDES. Each block { ... } below builds one slide. Slide order = order below.
+// ============================================================================
+
+// 1. Title slide: dark background, no footer
 {
   const s = pres.addSlide();
   s.background = { color: C.navy };
@@ -88,7 +132,7 @@ const landPeak = Math.max(P.transition.land.max_abs_roll_deg, P.transition.land.
   s.addText("Gazebo Harmonic + ArduPlane SITL: automated hover and transition flights", { x: 0.6, y: 3.2, w: 8.8, h: 0.4, fontFace: FONT, fontSize: 14, color: "C9D3E0", margin: 0, isTextBox: true });
 }
 
-// 2. Summary -----------------------------------------------------------------------
+// 2. Summary: four headline numbers and three key findings
 {
   const s = pres.addSlide();
   title(s, `Without the pod: ${dMass.toFixed(0)} g lighter, and the flight changes`,
@@ -119,14 +163,16 @@ const landPeak = Math.max(P.transition.land.max_abs_roll_deg, P.transition.land.
   footer(s);
 }
 
-// 4. Gazebo renders: with pod ------------------------------------------------------
+// 4 and 5. Gazebo renders: one slide per airframe, five views each.
+// Layout: three pictures in the top row, two centred in the bottom row.
 function renderSlide(variant, label, colour) {
-  const s = pres.addSlide();
+  const s = pres.addSlide();                         // a new slide
   title(s, `The airframe in Gazebo: ${label}`, "Rendered by Gazebo's own camera sensors (the same renderer the GUI uses)");
   const views = ["iso", "top", "side", "front", "rear"];
   const names = { iso: "Isometric", top: "Top", side: "Side", front: "Front", rear: "Rear" };
   const w = 2.72, h = 1.7;
-  views.forEach((v, i) => {
+  views.forEach((v, i) => {                          // place each picture in turn
+    // row 0 = top (views 0-2), row 1 = bottom (views 3-4)
     const row = i < 3 ? 0 : 1;
     const col = i < 3 ? i : i - 3;
     const x = row === 0 ? 0.5 + col * (w + 0.15) : 0.5 + 0.5 * (w + 0.15) + col * (w + 0.15);
@@ -140,7 +186,7 @@ function renderSlide(variant, label, colour) {
 renderSlide("pod", "with the vial pod", C.pod);
 renderSlide("nopod", "without the vial pod", C.nopod);
 
-// 5. Mass and inertia -------------------------------------------------------------
+// 6. Mass and inertia: a comparison table plus three plain-language bullets
 {
   const s = pres.addSlide();
   title(s, `Mass and inertia: the pod is ${dMass.toFixed(0)} g, the CG hardly moves`,
@@ -162,7 +208,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 6. Hover numbers ----------------------------------------------------------------
+// 7. Hover numbers: table of climb and hold results
 {
   const s = pres.addSlide();
   title(s, "Hover: the lighter airframe climbs higher and holds with similar attitude");
@@ -183,7 +229,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 7. Hover chart -------------------------------------------------------------------
+// 8. Hover chart: the altitude, roll and pitch traces picture (made by flight_metrics.py)
 {
   const s = pres.addSlide();
   title(s, "Hover flight: altitude, roll and pitch over the whole test");
@@ -193,7 +239,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 8. Forward flight -----------------------------------------------------------------
+// 9. Forward flight: table of speed and altitude numbers
 {
   const s = pres.addSlide();
   title(s, "Forward flight: both reach about 20 m/s", "FBWB for 30 s. Steady values use the second half of the phase.");
@@ -214,7 +260,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 9. Transition: airspeed and tilt ---------------------------------------------------
+// 10. Transition chart: airspeed and tilt command over the whole test
 {
   const s = pres.addSlide();
   title(s, "Transition: airspeed and tilt command");
@@ -224,7 +270,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 10. Transition full time series -----------------------------------------------------
+// 11. Transition chart: altitude and attitude over the whole test
 {
   const s = pres.addSlide();
   title(s, "Transition flight: altitude, roll and pitch over the whole test");
@@ -234,7 +280,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 11. Back to hover and landing ---------------------------------------------------------
+// 12. Return to hover and landing: table of the final phases
 {
   const s = pres.addSlide();
   title(s, "Return to hover and landing");
@@ -254,7 +300,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 12. Control effort ---------------------------------------------------------------
+// 13. Control effort: how hard the autopilot works (motor, tilt, aileron and V-tail commands)
 {
   const s = pres.addSlide();
   title(s, "Control effort in hover", "Hold phase. Spread (std) is how much each command moves: higher means the controller is working harder.");
@@ -274,7 +320,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 13. Interpretation ---------------------------------------------------------------
+// 14. Interpretation: what the differences mean, in words
 {
   const s = pres.addSlide();
   title(s, "What the differences mean");
@@ -287,7 +333,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
-// 14. Caveats ------------------------------------------------------------------------
+// 15. Caveats and next steps: what the results do not prove
 {
   const s = pres.addSlide();
   title(s, "Caveats and next steps");
@@ -301,5 +347,7 @@ renderSlide("nopod", "without the vial pod", C.nopod);
   footer(s);
 }
 
+// Write the file. writeFile returns a promise (an "I will finish later" object), so
+// .then() runs after the file is saved, and prints where it went.
 const out = R("docs/Stallion_V2_Pod_vs_NoPod_Flight_Dynamics.pptx");
 pres.writeFile({ fileName: out }).then(() => console.log(`wrote ${out} (${pageNo + 1} slides)`));
