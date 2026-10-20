@@ -62,7 +62,9 @@ COMPONENT_MASS = {
     "AILERON SERVO": 0.012, "V-TAIL SERVO": 0.012,                       # EMAX ES08MA II surface servos
     "FC -": 0.010, "RX -": 0.019, "USB EXT": 0.005,                      # flight controller, receiver, USB lead
     "BATTERY -": 0.730,                                                  # 4S 8000 mAh battery
-    "VIAL POD": 0.075,                                                   # each of the 2 pod parts
+    # The box (vial pod) is 2 parts. The CFD study's mass model (LW-PLA, 0.8 mm walls)
+    # gives the box 40 g in total, so each part is 20 g.
+    "VIAL POD": 0.020,
 }
 CARBON_DENSITY = 1600.0  # kg per cubic metre (typical carbon fibre composite)
 
@@ -184,6 +186,17 @@ def compute(path, printed_mass, battery_shift_x=0.0, drop=()):
         "cg_aft_of_root_le_mm": float((root_le_x - cg[0]) * 1000),  # how far behind the LE the CG is
         "battery_x": float(parts[[n for n in parts if n.startswith("BATTERY -")][0]].centroid[0]),
     }
+
+
+def printed_mass_for_total(path, total_kg, battery_shift_x=0.0, drop=()):
+    """Return the printed-plastic mass (kg) that makes the aircraft weigh total_kg.
+
+    Everything except printed plastic has a fixed mass (catalogue parts, carbon,
+    extras). So: printed mass = wanted total - mass of everything else.
+    We get "everything else" by running compute() with zero printed mass.
+    """
+    rest = compute(path, 0.0, battery_shift_x, drop)["mass_kg"]
+    return total_kg - rest
 
 
 def main():

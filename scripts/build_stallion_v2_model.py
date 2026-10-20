@@ -60,7 +60,7 @@ import os         # builds file paths and creates folders
 import numpy as np      # array maths
 import trimesh          # loads and manipulates 3D meshes
 
-from mass_properties import GLTF_TO_FLU, compute   # coordinate conversion + mass estimate
+from mass_properties import GLTF_TO_FLU, compute, printed_mass_for_total   # coordinate conversion + mass estimate
 from mesh_check import load_parts                  # loads named parts from the GLB
 
 # Folder of this script, and the folder that holds the Gazebo models.
@@ -78,16 +78,58 @@ BATTERY_SHIFT = 0.057        # metres
 # The manual's CG position: 60 mm behind the leading edge of the wing root.
 CG_AFT_OF_ROOT_LE = 0.060    # metres
 
+# ----------------------------------------------------------------------------
+# Assumptions taken from the CFD study (Stallion_box_vs_nobox_CFD.pptx, 0.8 mm walls)
+# ----------------------------------------------------------------------------
+# All-up mass WITH the box. The printed-plastic mass is solved so the model weighs
+# exactly this; the same printed mass is then used without the box, which gives
+# 2228 g, also the CFD value (the box is 40 g, see mass_properties.py).
+TARGET_MASS_WITH_BOX = 2.268     # kg
+# Whole-aircraft drag coefficient at 0 deg angle of attack, 20 m/s (CFD slide 4),
+# on the CFD reference area. Used to set the drag of each version.
+CFD_REF_AREA = 0.22068           # m^2
+CFD_CD0 = {"pod": 0.06648, "nopod": 0.05830}
+# The wing LiftDrag elements already make some drag at 0 deg (area x cda x a0 =
+# 0.265 x 0.13 x 0.063 m^2). The parasite-drag element supplies the rest, so the
+# total drag at 0 deg matches the CFD for each version.
+WING_DRAG_AREA_0DEG = 0.265 * 0.13 * 0.063   # m^2 (CD x area)
+PARASITE_CD = 0.20               # drag coefficient of the parasite element
+
+
+def parasite_area(variant):
+    """Area (m^2) of the parasite-drag element so the total CdA at 0 deg matches the CFD."""
+    return (CFD_CD0[variant] * CFD_REF_AREA - WING_DRAG_AREA_0DEG) / PARASITE_CD
+
+
 # Which CAD parts each variant removes, and which models it writes.
-#   "pod"   : the normal aircraft. Writes two models, stallion_vtol (flown) and
-#             stallion_vtol_2 (a second copy that sits on the runway).
-#   "nopod" : the aircraft without the vial pod. Writes stallion_vtol_nopod.
+#   "pod"   : the normal aircraft (with the box). Writes two models, stallion_vtol
+#             (flown) and stallion_vtol_2 (a second copy that sits on the runway).
+#   "nopod" : the aircraft without the box. Writes stallion_vtol_nopod.
 # Each entry is (model folder name, ArduPilot JSON port). The port is the UDP
 # number the autopilot talks to for that airframe.
 VARIANTS = {
     "pod": {"drop": [], "models": [("stallion_vtol", 9002), ("stallion_vtol_2", 9012)]},
     "nopod": {"drop": ["VIAL POD"], "models": [("stallion_vtol_nopod", 9002)]},
 }
+
+
+def solve_mass_and_battery(glb):
+    """Printed mass and battery shift for the CFD target mass, CG at the manual position.
+
+    Both are solved on the WITH-box aircraft and then used for both versions, so the
+    only difference between them is the box itself (its 40 g and its drag).
+    The battery shift is found with two quick evaluations: the CG moves in a straight
+    line with the battery position, so two points give the exact answer.
+    """
+    shift = BATTERY_SHIFT
+    for _ in range(2):
+        printed = printed_mass_for_total(glb, TARGET_MASS_WITH_BOX, shift)
+        mp = compute(glb, printed, shift)
+        err = mp["cg_aft_of_root_le_mm"] / 1000 - CG_AFT_OF_ROOT_LE   # + = CG too far aft
+        # Moving the battery forward by d moves the CG forward by d * m_batt / M
+        shift += err * mp["mass_kg"] / 0.730
+    printed = printed_mass_for_total(glb, TARGET_MASS_WITH_BOX, shift)
+    return printed, shift
 
 # ----------------------------------------------------------------------------
 # MOVING: which CAD parts belong to which moving link.
@@ -438,14 +480,17 @@ def build(glb, variant="pod"):
     # The leading edge of the left wing root is our reference for the CG position
     root_le_x = parts["WING ROOT L"].bounds[1, 0]
     # --- 3. Mass, CG and inertia for this variant ---
-    mp = compute(glb, 1.0, BATTERY_SHIFT, drop)
+    # Printed mass and battery position come from the CFD target mass (with box),
+    # and are the same for both versions.
+    printed, shift = solve_mass_and_battery(glb)
+    mp = compute(glb, printed, shift, drop)
     # --- 4. Put the model origin at the CG target ---
     # x: 60 mm behind the wing-root leading edge; z: the computed CG height; y: centre line
     origin = np.array([root_le_x - CG_AFT_OF_ROOT_LE, 0.0, mp["cg_flu_m"][2]])
     for n, m in parts.items():
         m.apply_translation(-origin)                 # shift everything so the origin is at (0,0,0)
         if n.startswith("BATTERY -"):
-            m.apply_translation([BATTERY_SHIFT, 0, 0])   # move the battery as described above
+            m.apply_translation([shift, 0, 0])       # move the battery as described above
     # The real CG relative to the origin. Zero for the pod version (within rounding);
     # for the no-pod version it is a few tenths of a millimetre. Gazebo needs it
     # so the simulated balance is correct.
@@ -578,12 +623,14 @@ def build(glb, variant="pod"):
             n = (0, -np.sin(dih) * y, np.cos(dih))   # lift direction: tilted by the dihedral angle
             aero += liftdrag(f"V-tail panel {s} + ruddervator", "base_link", (-0.55, 0.115 * y, 0.085), 0.0322,
                              n, 0.0, 3.0, 0.10, 0.30, cj=f"ruddervator_{s}_joint", rad_to_cl=-1.5)
-        # Parasite drag: the drag of the fuselage, pod, booms and motors (not lift).
-        # A zero-lift element with a0 = 1 rad gives drag that is almost constant,
-        # with CdA = 0.054 m^2 x 0.20 = 0.0108 m^2.
-        # The pod is not modelled separately here, so this value is the same for both variants.
-        aero += liftdrag("Parasite drag: frontal area 5.4 dm2 x Cd 0.20 (no lift)", "base_link", (0, 0, 0),
-                         0.054, (0, 0, 1), 1.0, 0.0, 0.20, 10.0, cla_stall=0.0, cda_stall=0.0)
+        # Parasite drag: the drag of the fuselage, box, booms and motors (not lift).
+        # A zero-lift element with a0 = 1 rad gives drag that is almost constant.
+        # Its area is set per version so the whole aircraft matches the CFD drag at
+        # 0 deg: with the box CD 0.0665, without 0.0583 (on 0.2207 m^2).
+        pa = parasite_area(variant)
+        aero += liftdrag(f"Parasite drag: {pa:.4f} m2 x Cd {PARASITE_CD} (no lift), matches CFD CD0 {CFD_CD0[variant]}",
+                         "base_link", (0, 0, 0), round(pa, 4), (0, 0, 1), 1.0, 0.0, PARASITE_CD, 10.0,
+                         cla_stall=0.0, cda_stall=0.0)
 
         # ---- The autopilot link (ArduPilot JSON bridge) ----
         # ArduPilot runs as a separate program. This plugin exchanges packets with it:
@@ -614,7 +661,8 @@ def build(glb, variant="pod"):
     Flightory Stallion V2 VTOL ({variant}) — GENERATED by scripts/build_stallion_v2_model.py
     from the repaired CAD (GLB). Do not hand-edit: change the script and re-run.
     Origin = CG target (manual: 60 mm aft of wing-root LE). AUW {mp['mass_kg']*1000:.0f} g (estimate).
-    Battery assumed {BATTERY_SHIFT*1000:.0f} mm forward of the CAD's provisional position to hit that CG.
+    Mass and drag from the CFD study (0.8 mm walls): printed plastic {printed*1000:.0f} g, box 40 g.
+    Battery assumed {shift*1000:.0f} mm forward of the CAD's provisional position to hit that CG.
   -->
   <model name="{model_name}">
     <self_collide>false</self_collide>           <!-- parts of the aircraft do not collide with each other -->

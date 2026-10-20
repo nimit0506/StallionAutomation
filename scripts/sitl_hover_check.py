@@ -99,8 +99,17 @@ def fly(m, seconds, throttle, log):
     while time.time() < t_end:
         rc_throttle(m, throttle)                     # keep the throttle command alive
         # Wait up to 0.2 s for any of the four message types we use
-        msg = m.recv_match(type=["GLOBAL_POSITION_INT", "ATTITUDE", "VFR_HUD", "SERVO_OUTPUT_RAW"], blocking=True, timeout=0.2)
+        msg = m.recv_match(type=["GLOBAL_POSITION_INT", "ATTITUDE", "VFR_HUD", "SERVO_OUTPUT_RAW", "GPS_RAW_INT"], blocking=True, timeout=0.2)
         if msg is None:
+            continue
+        # GPS altitude: the simulated GPS sensor, close to the true height. We log it next
+        # to the autopilot's own estimate (alt), because the estimate can drift in forward
+        # flight. The first GPS reading (aircraft on the ground) is taken as zero.
+        if msg.get_type() == "GPS_RAW_INT":
+            if msg.fix_type >= 3:                    # only use a proper 3D fix
+                if "gps_home" not in log:
+                    log["gps_home"] = msg.alt
+                log["gps_alt"] = (msg.alt - log["gps_home"]) / 1000.0   # mm -> m, relative to take-off
             continue
         # Servo outputs: the PWM values the autopilot is sending to each servo and motor
         if msg.get_type() == "SERVO_OUTPUT_RAW":
@@ -129,7 +138,7 @@ def fly(m, seconds, throttle, log):
             log["last_csv"] = now
             CSV.write(f"{now - T0:.2f},{PHASE},{log['alt']:.3f},{log['roll']:.2f},{log['pitch']:.2f},"
                       f"{log['gs']:.2f},{log['aspd']:.2f},{','.join(map(str, log['servo']))},"
-                      f"{','.join(map(str, log['motors']))}\n")
+                      f"{','.join(map(str, log['motors']))},{log.get('gps_alt', 0.0):.3f}\n")
         # Print a line to the screen at most every PRINT_DT seconds
         if now - log["last_print"] > PRINT_DT:
             log["last_print"] = now
@@ -158,7 +167,8 @@ def main():
     global PRINT_DT, VERBOSE, CSV, PHASE
     if args.csv:
         CSV = open(args.csv, "w", buffering=1)       # buffering=1: write each line straight away
-        CSV.write("t,phase,alt,roll,pitch,gs,aspd,tilt,ail,vtail_l,vtail_r,m_fr,m_fl,m_rear\n")   # column names
+        # column names (gps_alt = GPS height above take-off, the check against alt)
+        CSV.write("t,phase,alt,roll,pitch,gs,aspd,tilt,ail,vtail_l,vtail_r,m_fr,m_fl,m_rear,gps_alt\n")
     if args.verbose:
         PRINT_DT, VERBOSE = 0.25, True               # print four times per second
 
