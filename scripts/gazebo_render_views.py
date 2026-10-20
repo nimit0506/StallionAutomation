@@ -93,6 +93,10 @@ def build_world(model_name):
     src = open(BASE_WORLD).read()
     # Drop the two runway airframes; this world shows one airframe at the origin
     src = re.sub(r"\s*<!-- Spawn Stallion.*?</include>\n", "\n", src, flags=re.S)
+    # Render look only: grey ground and a light grey background instead of the flight world's green and blue
+    src = src.replace("<ambient>0.3 0.5 0.3 1</ambient>", "<ambient>0.55 0.55 0.55 1</ambient>")
+    src = src.replace("<diffuse>0.3 0.5 0.3 1</diffuse>", "<diffuse>0.55 0.55 0.55 1</diffuse>")
+    src = src.replace("<background>0.6 0.7 0.9 1.0</background>", "<background>0.82 0.82 0.84 1.0</background>")
     airframe = f"""    <include>
       <uri>model://{model_name}</uri>
       <pose>0 0 0.08 0 0 0</pose>
