@@ -1,0 +1,32 @@
+{
+ "box": {
+  "forward_flight_pass": true,
+  "landed": true,
+  "climb_rate_ms": 1.35,
+  "hover_tilt_rms_deg": 0.47,
+  "hover_motor_pwm": 1666,
+  "hover_rear_thrust_share_pct": 30.8,
+  "time_to_12ms_s": 2.9,
+  "cruise_airspeed_ms": 20.2,
+  "cruise_front_motor_pwm": 1807,
+  "cruise_height_spread_m": 0.18,
+  "forward_estimate_error_m": 0.8,
+  "landing_time_s": 61.4,
+  "landing_max_tilt_deg": 20.2
+ },
+ "nobox": {
+  "forward_flight_pass": true,
+  "landed": true,
+  "climb_rate_ms": 1.32,
+  "hover_tilt_rms_deg": 0.48,
+  "hover_motor_pwm": 1661,
+  "hover_rear_thrust_share_pct": 31.3,
+  "time_to_12ms_s": 3.4,
+  "cruise_airspeed_ms": 20.7,
+  "cruise_front_motor_pwm": 1803,
+  "cruise_height_spread_m": 0.65,
+  "forward_estimate_error_m": 1.0,
+  "landing_time_s": 59.5,
+  "landing_max_tilt_deg": 17.9
+ }
+}

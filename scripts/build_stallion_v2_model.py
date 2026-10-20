@@ -102,13 +102,12 @@ def parasite_area(variant):
 
 
 # Which CAD parts each variant removes, and which models it writes.
-#   "pod"   : the normal aircraft (with the box). Writes two models, stallion_vtol
-#             (flown) and stallion_vtol_2 (a second copy that sits on the runway).
+#   "pod"   : the normal aircraft (with the box). Writes stallion_vtol.
 #   "nopod" : the aircraft without the box. Writes stallion_vtol_nopod.
 # Each entry is (model folder name, ArduPilot JSON port). The port is the UDP
 # number the autopilot talks to for that airframe.
 VARIANTS = {
-    "pod": {"drop": [], "models": [("stallion_vtol", 9002), ("stallion_vtol_2", 9012)]},
+    "pod": {"drop": [], "models": [("stallion_vtol", 9002)]},
     "nopod": {"drop": ["VIAL POD"], "models": [("stallion_vtol_nopod", 9002)]},
 }
 
