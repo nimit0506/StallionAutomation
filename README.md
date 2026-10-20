@@ -1,141 +1,81 @@
-# Flightory Stallion VTOL — Gazebo + ArduPilot SITL Simulation
+# Stallion V2 VTOL — Gazebo + ArduPlane SITL
 
-## Quick Start (2-Terminal Method — Recommended)
+Simulation of the Stallion V2 quad-tilt tricopter VTOL (with vial pod). The airframe
+comes from the repaired CAD export in `inputs/`. Gazebo Harmonic runs the physics, and
+ArduPlane SITL (QuadPlane, tilt-rotor settings) flies it through the JSON bridge.
 
-### Terminal 1: Start Gazebo
+- **How it works, file by file:** [`docs/CODE_GUIDE.md`](docs/CODE_GUIDE.md)
+- **Results (flight logs, images, summary):** [`results/`](results/README.md)
+- **Slides:** [`docs/Stallion_V2_Sim_Results.pptx`](docs/Stallion_V2_Sim_Results.pptx)
+
+## Layout
+
+```
+inputs/                              raw GLB from CAD, and the repaired GLB the model is built from
+scripts/
+  mesh_check.py                      topology check per CAD part (watertight, manifold, sheets)
+  mesh_repair.py                     repairs bad parts (basic fixes, then shrink-wrap fallback)
+  mass_properties.py                 mass, centre of gravity and inertia from the GLB
+  build_stallion_v2_model.py         writes the Gazebo model (meshes + model.sdf) from the GLB
+  sim_model.scad                     OpenSCAD scene of the airframe for the sim images
+  render_sim_images.sh               renders the five views into results/images/
+  sitl_hover_check.py                automated flight test (hover, optional transition, landing)
+  run_headless_test.sh               starts Gazebo + SITL + MAVProxy and runs the flight test
+  launch_gazebo_only.sh              manual: Gazebo with GUI (terminal 1)
+  launch_sitl_only.sh                manual: ArduPlane SITL with MAVProxy (terminal 2)
+gazebo/
+  worlds/stallion_runway.sdf         runway world; spawns both airframes
+  models/stallion_vtol/              airframe 1 — flown by SITL on UDP 9002
+  models/stallion_vtol_2/            airframe 2 — spawned, no autopilot attached
+params/stallion_vtol_sitl.parm       ArduPlane QuadPlane / tilt / PID parameters for the sim
+docs/                                slides
+results/                             flight logs, summary, mesh checks, sim images
+```
+
+## Setup
+
+You need: Python 3 with `numpy trimesh manifold3d scipy scikit-image pymavlink`,
+Gazebo Harmonic (`gz`), OpenSCAD (for the images), and MAVProxy.
+You also need two builds, at the paths below (or set the env vars):
+
+| Component | Default path | Env var |
+|---|---|---|
+| ArduPilot source, built for SITL (`build/sitl/bin/arduplane`) | `~/ardupilot` | `ARDUPILOT_DIR` |
+| ardupilot_gazebo, built (`build/libArduPilotPlugin.so`) | `~/ardupilot_gazebo` | `ARDUPILOT_GZ_DIR` |
+
 ```bash
-cd /path/to/StallionAutomation
-bash scripts/launch_gazebo_only.sh
+pip install numpy trimesh manifold3d scipy scikit-image pymavlink
 ```
-Wait until the Gazebo 3D window appears with the Stallion model on the ground.
 
-### Terminal 2: Start SITL
+## Run it
+
 ```bash
-cd /path/to/StallionAutomation
-bash scripts/launch_sitl_only.sh
-```
-Wait for MAVProxy to connect. You should see `GPS fix` and heartbeat messages.
+# 1. Check the GLB and repair it if needed (writes a new GLB)
+python3 scripts/mesh_check.py inputs/stallion_v2_pod_repaired.glb
+python3 scripts/mesh_repair.py inputs/stallion_v2_equipped_with_pod.glb /tmp/repaired.glb
 
-### Fly!
-In the MAVProxy console (Terminal 2):
-```
-mode QHOVER
-arm throttle
-rc 3 1600
-```
-The drone should lift off and hover in the Gazebo window.
+# 2. Mass / CG / inertia
+python3 scripts/mass_properties.py inputs/stallion_v2_pod_repaired.glb --battery-shift 0.057
 
-To land:
-```
-rc 3 1000
-mode QLAND
+# 3. Build the Gazebo model from the repaired GLB (writes gazebo/models/*)
+python3 scripts/build_stallion_v2_model.py inputs/stallion_v2_pod_repaired.glb
+
+# 4. Flight test, no GUI (hover only, or add --transition for forward flight + landing)
+scripts/run_headless_test.sh --csv results/clean_repo_rerun/hover_log.csv
+scripts/run_headless_test.sh --transition --climb-time 30 --climb-throttle 1800 --csv results/clean_repo_rerun/transition_log.csv
+
+# 5. Sim images
+xvfb-run -a scripts/render_sim_images.sh      # or plain: scripts/render_sim_images.sh
 ```
 
----
+For a GUI session instead, run `scripts/launch_gazebo_only.sh` in one terminal and
+`scripts/launch_sitl_only.sh` in a second one, then fly from MAVProxy.
 
-## Quick Start (Single-Terminal Method)
-```bash
-bash scripts/start_gazebo_stallion.sh
-```
+Step 3 regenerates the model. The committed model is reproduced byte for byte from
+`inputs/stallion_v2_pod_repaired.glb`, so a clean diff after step 3 means the build is stable.
 
----
+## History
 
-## Automated Flight Check
-With Gazebo + SITL running, in a third terminal:
-```bash
-python3 scripts/sitl_hover_check.py                 # hover: QHOVER climb, hold, QLAND
-python3 scripts/sitl_hover_check.py --transition --climb-time 30 --climb-throttle 1800
-                                                    # + transition to FBWB forward flight
-```
-Prints altitude/attitude/servo outputs and a PASS/FAIL verdict.
-
-### Paths
-The scripts find the repo from their own location, so they work from any clone
-(WSL or plain Linux). Override if your installs live elsewhere:
-`ARDUPILOT_DIR=~/ardupilot ARDUPILOT_GZ_DIR=~/ardupilot_gazebo bash scripts/launch_sitl_only.sh`.
-WSLg display settings and the Windows Mission Planner address are only applied on WSL.
-
----
-
-## Connect Mission Planner (Windows)
-1. Open Mission Planner on Windows
-2. Select **UDP** connection type
-3. Click **Connect**
-4. Enter the UDP port: **14550**
-5. Done — you should see telemetry from the Stallion VTOL
-
----
-
-## Prerequisites
-
-### 1. ArduPilot Source
-```bash
-cd ~/
-git clone https://github.com/ArduPilot/ardupilot.git
-cd ardupilot
-git submodule update --init --recursive
-Tools/environment_install/install-prereqs-ubuntu.sh -y
-```
-
-### 2. Gazebo Harmonic
-```bash
-sudo apt install gz-harmonic
-```
-
-### 3. ArduPilot Gazebo Plugin
-```bash
-cd ~/
-git clone https://github.com/ArduPilot/ardupilot_gazebo.git
-cd ardupilot_gazebo
-mkdir -p build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j$(nproc)
-```
-
-Verify: `ls ~/ardupilot_gazebo/build/libArduPilotPlugin.so` should exist.
-
----
-
-## Autonomous Mission
-After SITL is running:
-```
-wp load /path/to/StallionAutomation/missions/chennai_loop_01.waypoints
-mode QHOVER
-arm throttle
-mode AUTO
-```
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| Gazebo window doesn't open | Run `echo $DISPLAY` — should show `:0`. Install WSLg. |
-| "libArduPilotPlugin.so not found" | Build ardupilot_gazebo (see Prerequisites step 3) |
-| SITL says "waiting for JSON" | Gazebo isn't running or world didn't load correctly |
-| Drone falls through ground | Verify model.sdf has `<collision>` on base_link |
-| Drone doesn't fly / zero thrust | Verify LiftDrag plugins have `<joint_name>` tags |
-| Mission Planner won't connect | Check Windows firewall allows UDP port 14550 |
-
----
-
-## File Structure
-```
-Stallion/
-├── gazebo/
-│   ├── models/stallion_vtol/
-│   │   ├── model.config          # Gazebo model metadata
-│   │   ├── model.sdf             # Full drone physics model
-│   │   └── meshes/               # STL mesh files (from CAD)
-│   └── worlds/
-│       └── stallion_runway.sdf   # World with ground plane + Chennai coords
-├── scripts/
-│   ├── launch_gazebo_only.sh     # Terminal 1: Gazebo only
-│   ├── launch_sitl_only.sh       # Terminal 2: SITL only (connects to Gazebo)
-│   └── start_gazebo_stallion.sh  # All-in-one launcher
-├── params/
-│   └── stallion_vtol_sitl.parm   # ArduPlane parameters for Stallion VTOL
-└── missions/
-    └── chennai_loop_01.waypoints # Test mission around Chennai
-```
+This cleanup removed material that was not used by the V2 simulation: the original CAD
+folders, firmware and HIL/CAN/swarm code, the v1 meshes, and a duplicate of the model.
+Everything removed is still in git history, before the cleanup commit (`8d0a300`).

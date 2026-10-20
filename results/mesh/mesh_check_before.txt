@@ -1,0 +1,99 @@
+part                                           faces wt  wind inv  degen dup  nonman open  sheet
+VIAL POD - bottom access hatch                    40 Y   Y    -        0    0      0     0  -
+VIAL POD - direct rail mount                    1716 Y   Y    -        0    0      0     0  -
+FUS 1L                                         18062 Y   Y    -        0    0      0     0  -
+FUS 1R                                         18056 Y   Y    -        0    0      0     0  -
+FUS 2L                                         21228 n   Y    -        0    0      0     4  -  <-- needs repair
+FUS 2R                                         21224 Y   Y    -        0    0      0     0  -
+FUS 3L                                         12536 Y   Y    -        0    0      0     0  -
+FUS 3R                                         12536 Y   Y    -        0    0      0     0  -
+FUS 4L                                         15204 Y   Y    -        0    0      0     0  -
+FUS 4R                                         15182 n   Y    -        0    0      0     4  -  <-- needs repair
+FUS 5L                                         14936 Y   Y    -        0    0      0     0  -
+FUS 5R                                         14938 Y   Y    -        0    0      0     0  -
+NOSE                                           42380 n   Y    -        0   34    217     0  -  <-- needs repair
+NOSE TOP                                       10772 n   Y    -        0    6     17     0  -  <-- needs repair
+HATCH FRONT 1                                  14206 n   Y    -        0    2     12     0  -  <-- needs repair
+HATCH FRONT 2                                  14048 n   Y    -        0    1     16    32  -  <-- needs repair
+HATCH REAR 1                                   14994 n   Y    -        0    1     18     0  -  <-- needs repair
+HATCH REAR 2                                    8458 n   Y    -        0    4     17     0  -  <-- needs repair
+FRONT REINFORCEMENT                             4828 n   Y    -        0    0      6     0  Y  <-- needs repair
+BATTERY PAD                                     3544 Y   Y    -        0    0      0     0  -
+WING 1L VTOL                                    2886 n   Y    -        0    0      0    12  -  <-- needs repair
+WING 2L VTOL                                    3038 Y   Y    -        0    0      0     0  -
+WING 3 L NO LED                                 1738 n   Y    -        0    0      0     4  -  <-- needs repair
+WINGTIP L NO LED                               20680 Y   Y    -        0    0      0     0  -
+WING ROOT L                                     1094 n   Y    -        0    0      0     4  -  <-- needs repair
+FUS ROOT L                                      1882 Y   Y    -        0    0      0     0  -
+AILERON 1L                                      1054 n   Y    -        0    0      0    32  -  <-- needs repair
+AILERON 2L                                      1102 n   Y    -        0    0      0    20  -  <-- needs repair
+WING LOCK FRONT L                               2186 n   Y    -        0    0      4     0  -  <-- needs repair
+WING LOCK BASE                                  1852 Y   Y    -        0    0      0     0  -
+WING LOCK REAR L                                1262 n   Y    -        0    0      4     0  -  <-- needs repair
+WING LOCK BASE [2]                              1852 Y   Y    -        0    0      0     0  -
+WING 1R VTOL                                    2938 n   Y    -        0    0      0    12  -  <-- needs repair
+WING 2R VTOL                                    3042 Y   Y    -        0    0      0     0  -
+WING 3 R NO LED                                 1500 n   Y    -        0    0      0    12  -  <-- needs repair
+WINGTIP R NO LED                               20672 Y   Y    -        0    0      0     0  -
+WING ROOT R                                     1094 n   Y    -        0    0      0     4  -  <-- needs repair
+FUS ROOT R                                      1882 Y   Y    -        0    0      0     0  -
+AILERON 1R                                      1060 Y   Y    -        0    0      0     0  -
+AILERON 2R                                      1108 Y   Y    -        0    0      0     0  -
+WING LOCK FRONT R                               2186 n   Y    -        0    0      4     0  -  <-- needs repair
+WING LOCK BASE [3]                              1852 Y   Y    -        0    0      0     0  -
+WING LOCK REAR R                                1256 n   Y    -        0    0      4     0  -  <-- needs repair
+WING LOCK BASE [4]                              1852 Y   Y    -        0    0      0     0  -
+SERVO COVER R                                   1530 Y   Y    -        0    0      0     0  -
+SERVO COVER L                                   1530 Y   Y    -        0    0      0     0  -
+TAIL 1                                         23096 n   Y    -        0   17     73    20  -  <-- needs repair
+TAIL 2                                         22712 n   Y    -        0    8     34     0  -  <-- needs repair
+TAIL 3                                         34086 n   Y    -        0    0     12    12  -  <-- needs repair
+V TAIL 1 L                                      1274 Y   Y    -        0    0      0     0  -
+V TAIL 2 L                                       904 Y   Y    -        0    0      0     0  -
+V TAIL TIP L                                    9188 Y   Y    -        0    0      0     0  -
+RUDDER 1L                                       1040 n   Y    -        0    0      0    12  -  <-- needs repair
+RUDDER 2L                                       1104 Y   Y    -        0    0      0     0  -
+V TAIL 1 R                                      1268 Y   Y    -        0    0      0     0  -
+V TAIL 2 R                                       904 Y   Y    -        0    0      0     0  -
+V TAIL TIP R                                    9188 Y   Y    -        0    0      0     0  -
+RUDDER 1R                                       1040 n   Y    -        0    0      0    16  -  <-- needs repair
+RUDDER 2R                                       1110 Y   Y    -        0    0      0     0  -
+BOOM FUS MOUNT                                  7506 Y   Y    -        0    0      0     0  -
+BOOM FUS INSERT                                 5482 Y   Y    -        0    0      0     0  -
+BOOM KNOB                                      96656 Y   Y    -        0    0      0     0  -
+BOOM TAIL INSERT                                 936 Y   Y    -        0    0      0     0  -
+BOOM R                                         11346 n   Y    -        0    0     12     0  -  <-- needs repair
+BOOM L                                         11370 n   Y    -        0    0     12     0  -  <-- needs repair
+MOTOR MOUNT FRONT                              15188 Y   Y    -        0    0      0     0  -
+MOTOR MOUNT FRONT [2]                          15188 Y   Y    -        0    0      0     0  -
+MOTOR MOUNT TAIL                               12864 Y   Y    -        0    0      0     0  -
+LOCK 1                                          6180 Y   Y    -        0    0      0     0  -
+LOCK 2                                          1372 Y   Y    -        0    0      0     0  -
+LOCK SPRING                                     1404 Y   Y    -        0    0      0     0  -
+LOCK 1 [2]                                      6180 Y   Y    -        0    0      0     0  -
+LOCK 2 [2]                                      1372 Y   Y    -        0    0      0     0  -
+LOCK SPRING [2]                                 1404 Y   Y    -        0    0      0     0  -
+CARBON - tail boom 16x14 x430 mm                 768 Y   Y    -        0    0      0     0  -
+CARBON - main wing spar 10x8 x800 mm             768 Y   Y    -        0    0      0     0  -
+CARBON - secondary wing spar 8x6 x600 mm         768 Y   Y    -        0    0      0     0  -
+CARBON - wing spar RIGHT 6x4 x435 mm             768 Y   Y    -        0    0      0     0  -
+CARBON - V-tail RIGHT FRONT 4x2 x260 mm          768 Y   Y    -        0    0      0     0  -
+CARBON - V-tail RIGHT REAR 4x2 x250 mm           768 Y   Y    -        0    0      0     0  -
+CARBON - wing spar LEFT 6x4 x435 mm              768 Y   Y    -        0    0      0     0  -
+CARBON - V-tail LEFT FRONT 4x2 x260 mm           768 Y   Y    -        0    0      0     0  -
+CARBON - V-tail LEFT REAR 4x2 x250 mm            768 Y   Y    -        0    0      0     0  -
+BATTERY - GenX 4S 8000mAh (provisional)           24 Y   Y    -        0    0      0     0  -
+FC - Holybro Kakute F405-Wing Mini              6748 Y   Y    -        0    0      0     0  -
+USB EXT - estimated accessory                     48 Y   Y    -        0    0      0     0  -
+RX - Flysky FS-iA10B                             444 Y   Y    -        0    0      0     0  -
+MOTOR RIGHT - EMAX ECO II 2807 1300KV           2828 Y   Y    -        0    0      0     0  -
+MOTOR LEFT - EMAX ECO II 2807 1300KV            2828 Y   Y    -        0    0      0     0  -
+MOTOR TAIL - EMAX ECO II 2807 1300KV            2828 Y   Y    -        0    0      0     0  -
+TILT SERVO RIGHT - TowerPro MG90D                772 Y   Y    -        0    0      0     0  -
+TILT SERVO LEFT - TowerPro MG90D                 772 Y   Y    -        0    0      0     0  -
+AILERON SERVO RIGHT - EMAX ES08MA II             772 Y   Y    -        0    0      0     0  -
+AILERON SERVO LEFT - EMAX ES08MA II              772 Y   Y    -        0    0      0     0  -
+V-TAIL SERVO RIGHT - EMAX ES08MA II              772 Y   Y    -        0    0      0     0  -
+V-TAIL SERVO LEFT - EMAX ES08MA II               772 Y   Y    -        0    0      0     0  -
+
+96 parts, 68 clean, 28 need repair
