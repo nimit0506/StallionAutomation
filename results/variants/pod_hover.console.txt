@@ -1,0 +1,83 @@
+Heartbeat from system 1
+Arming...
+  [Arm: Accels inconsistent]
+  [EKF3 IMU0 tilt alignment complete]
+  [EKF3 IMU1 tilt alignment complete]
+  [EKF3 IMU0 MAG0 initial yaw alignment complete]
+  [EKF3 IMU1 MAG0 initial yaw alignment complete]
+  [Arm: Accels inconsistent]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [EKF3 IMU0 origin set]
+  [EKF3 IMU1 origin set]
+  [Arm: AHRS: not using configured AHRS type]
+  [Field Elevation Set: 10m]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [PreArm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [EKF3 IMU0 is using GPS]
+  [EKF3 IMU1 is using GPS]
+  [AHRS: EKF3 active]
+  [Throttle armed]
+Armed
+Climbing (throttle 1700)...
+  alt=  0.00 m  roll=  -0.3  pitch=  -0.2  gs=  0.0 m/s  tilt/ail/vtL/vtR=(0, 0, 0, 0)
+  alt=  0.78 m  roll=  -0.2  pitch=  -0.2  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  0.80 m  roll=  -0.4  pitch=  -0.3  gs=  0.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  0.83 m  roll=  -1.0  pitch=  -1.9  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  1.13 m  roll=  -0.9  pitch=  -1.0  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  1.86 m  roll=  -0.5  pitch=  -0.3  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  2.67 m  roll=  -0.0  pitch=  -0.2  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.31 m  roll=  -0.1  pitch=  -0.2  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.76 m  roll=   0.0  pitch=  -0.2  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+Holding (throttle 1500)...
+  alt=  4.17 m  roll=   0.1  pitch=  -0.4  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.53 m  roll=  -0.0  pitch=   0.0  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.69 m  roll=  -0.0  pitch=   0.5  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.69 m  roll=  -0.6  pitch=   1.1  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.61 m  roll=  -0.6  pitch=  -0.0  gs=  1.7 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1499, 1499)
+  alt=  4.53 m  roll=  -0.0  pitch=  -0.4  gs=  1.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.52 m  roll=  -0.2  pitch=  -0.3  gs=  2.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.55 m  roll=   0.3  pitch=  -0.4  gs=  2.0 m/s  tilt/ail/vtL/vtR=(1000, 1502, 1503, 1503)
+Landing (QLAND)...
+  alt=  4.55 m  roll=   0.1  pitch=   0.0  gs=  2.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1501, 1501)
+  alt=  4.55 m  roll=   1.2  pitch=   3.3  gs=  1.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.49 m  roll=  -3.4  pitch=  -5.2  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1499, 1500, 1500)
+  alt=  4.29 m  roll=   7.4  pitch=   0.3  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1499, 1499)
+  alt=  4.02 m  roll=  -1.2  pitch=   9.0  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.74 m  roll= -11.5  pitch=  -2.4  gs=  1.5 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.47 m  roll=   3.7  pitch= -12.0  gs=  1.6 m/s  tilt/ail/vtL/vtR=(1000, 1510, 1504, 1504)
+  alt=  3.18 m  roll=  12.3  pitch=   2.8  gs=  1.5 m/s  tilt/ail/vtL/vtR=(1000, 1487, 1496, 1496)
+  alt=  2.90 m  roll=  -0.5  pitch=  11.1  gs=  1.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1498, 1498)
+  alt=  2.60 m  roll= -10.1  pitch=   4.2  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  2.41 m  roll=  -6.3  pitch= -12.6  gs=  2.3 m/s  tilt/ail/vtL/vtR=(1000, 1529, 1519, 1519)
+  alt=  2.19 m  roll=   7.4  pitch=  -8.7  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1498, 1538, 1538)
+  alt=  1.93 m  roll=  13.4  pitch=   2.7  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1496, 1496, 1496)
+
+max_alt=4.71 m  max_tilt=13.4 deg
+PASS
+scripts/run_headless_test.sh: line 41:   371 Killed                  ( cd "$LOG_DIR" && rm -f eeprom.bin && exec "$SITL_BIN" --model JSON --speedup 1 --slave 0 --defaults "$ARDUPILOT_DIR/Tools/autotest/models/plane.parm,$PARAMS" --home 13.0827,80.2707,10,90 -I0 ) > "$LOG_DIR/sitl.log" 2>&1

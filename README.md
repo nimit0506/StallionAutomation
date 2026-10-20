@@ -27,6 +27,8 @@ gazebo/
   worlds/stallion_runway.sdf         runway world; spawns both airframes
   models/stallion_vtol/              airframe 1 — flown by SITL on UDP 9002
   models/stallion_vtol_2/            airframe 2 — spawned, no autopilot attached
+  models/stallion_vtol_nopod/        airframe without the vial pod (variant)
+  worlds/stallion_runway_nopod.sdf   world with the no-pod airframe
 params/stallion_vtol_sitl.parm       ArduPlane QuadPlane / tilt / PID parameters for the sim
 docs/                                slides
 results/                             flight logs, summary, mesh checks, sim images
@@ -64,7 +66,17 @@ python3 scripts/build_stallion_v2_model.py inputs/stallion_v2_pod_repaired.glb
 scripts/run_headless_test.sh --csv results/clean_repo_rerun/hover_log.csv
 scripts/run_headless_test.sh --transition --climb-time 30 --climb-throttle 1800 --csv results/clean_repo_rerun/transition_log.csv
 
-# 5. Sim images
+# 5. Without-pod variant: model, world, flight tests
+scripts/build_stallion_v2_model.py inputs/stallion_v2_pod_repaired.glb --variant nopod
+WORLD=gazebo/worlds/stallion_runway_nopod.sdf scripts/run_headless_test.sh --csv results/variants/nopod/hover_log.csv
+
+# 6. Flight-dynamics metrics and charts for both variants (results/variants/{pod,nopod})
+python3 scripts/flight_metrics.py results/variants --out results/metrics
+
+# 7. Slides (needs pptxgenjs: npm install pptxgenjs, then node scripts/build_variant_deck.js)
+node scripts/build_variant_deck.js
+
+# 8. Sim images
 xvfb-run -a scripts/render_sim_images.sh      # or plain: scripts/render_sim_images.sh
 ```
 

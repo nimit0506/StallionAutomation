@@ -13,7 +13,7 @@ Writes:
 
 Column meanings (from sitl_hover_check.py): t (s), phase, alt (m), roll and pitch (deg),
 gs ground speed (m/s), aspd airspeed (m/s), tilt (PWM, 1000 = hover, 2000 = forward),
-ail (PWM), vtail_l / vtail_r (PWM), m_fr / m_fl / m_rear (motor PWM).
+ail (PWM), vtail_l (PWM; the right V-tail command mirrors it, so the left channel is enough), m_fr / m_fl / m_rear (motor PWM).
 """
 import argparse
 import csv
@@ -93,7 +93,7 @@ def hover_phase(d, name):
         "motor_std_pwm": [round(float(x), 1) for x in motors.std(1)],
         "tilt_mean_pwm": round(float(d["tilt"][m].mean()), 0),
         "aileron_std_pwm": round(float(d["ail"][m].std()), 1),
-        "vtail_std_pwm": round(float((d["vtail_l"][m] - d["vtail_r"][m]).std()), 1),
+        "vtail_std_pwm": round(float(d["vtail_l"][m].std()), 1),
     }
     return out
 
@@ -125,7 +125,7 @@ def forward_phase(d, name="forward"):
         "max_abs_pitch_deg": round(float(np.abs(pitch).max()), 2),
         "tilt_pwm_mean": round(float(d["tilt"][m].mean()), 0),
         "aileron_std_pwm": round(float(d["ail"][m].std()), 1),
-        "vtail_std_pwm": round(float((d["vtail_l"][m] - d["vtail_r"][m]).std()), 1),
+        "vtail_std_pwm": round(float(d["vtail_l"][m].std()), 1),
     }
 
 

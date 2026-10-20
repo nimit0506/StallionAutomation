@@ -1,0 +1,224 @@
+Heartbeat from system 1
+Arming...
+  [Arm: Accels inconsistent]
+  [EKF3 IMU0 tilt alignment complete]
+  [EKF3 IMU1 tilt alignment complete]
+  [Arm: Accels inconsistent]
+  [EKF3 IMU0 MAG0 initial yaw alignment complete]
+  [EKF3 IMU1 MAG0 initial yaw alignment complete]
+  [Arm: AHRS: EKF3 Roll/Pitch inconsistent 10 deg. Wa]
+  [it or rebo]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [EKF3 IMU0 origin set]
+  [EKF3 IMU1 origin set]
+  [Field Elevation Set: 10m]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [PreArm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [Arm: AHRS: not using configured AHRS type]
+  [EKF3 IMU0 is using GPS]
+  [EKF3 IMU1 is using GPS]
+  [AHRS: EKF3 active]
+  [Throttle armed]
+Armed
+Climbing (throttle 1800)...
+  alt=  0.00 m  roll=  -0.1  pitch=  -1.1  gs=  0.0 m/s  tilt/ail/vtL/vtR=(0, 0, 0, 0)
+  alt=  0.05 m  roll=  -0.2  pitch=  -1.2  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  0.10 m  roll=  -1.1  pitch=  -1.5  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  0.40 m  roll=  -1.1  pitch=  -1.0  gs=  0.5 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  1.30 m  roll=  -0.7  pitch=  -0.1  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  2.37 m  roll=  -0.1  pitch=  -0.1  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.32 m  roll=   0.0  pitch=  -0.1  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.10 m  roll=   0.1  pitch=  -0.3  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.81 m  roll=   0.1  pitch=  -0.3  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  5.51 m  roll=  -0.3  pitch=  -0.3  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  6.21 m  roll=  -0.2  pitch=  -0.0  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  6.93 m  roll=   0.0  pitch=  -0.0  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  7.67 m  roll=  -0.2  pitch=  -0.2  gs=  0.5 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  8.37 m  roll=  -0.1  pitch=   0.2  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  9.07 m  roll=  -0.1  pitch=   0.3  gs=  0.7 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  9.73 m  roll=   0.2  pitch=   0.1  gs=  1.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 10.53 m  roll=   0.1  pitch=   0.2  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 11.32 m  roll=   0.0  pitch=   0.1  gs=  1.5 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 12.06 m  roll=  -0.1  pitch=   0.1  gs=  1.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 12.75 m  roll=  -0.2  pitch=   0.0  gs=  1.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 13.43 m  roll=   0.0  pitch=  -0.3  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 14.12 m  roll=   0.3  pitch=  -0.1  gs=  0.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 14.86 m  roll=   0.0  pitch=  -0.0  gs=  0.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 15.58 m  roll=  -0.0  pitch=  -0.0  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 16.28 m  roll=  -0.2  pitch=  -0.0  gs=  1.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+Holding (throttle 1500)...
+  alt= 16.98 m  roll=  -0.0  pitch=  -0.1  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 17.66 m  roll=   0.3  pitch=   0.1  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.10 m  roll=  -0.1  pitch=   0.2  gs=  0.7 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.18 m  roll=  -0.1  pitch=  -0.1  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.12 m  roll=  -0.1  pitch=  -0.3  gs=  0.7 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.08 m  roll=  -0.1  pitch=  -0.3  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.09 m  roll=   0.0  pitch=  -0.2  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1501, 1501)
+  alt= 18.12 m  roll=   0.2  pitch=  -0.1  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.14 m  roll=   0.2  pitch=  -0.0  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+Transition to forward flight (FBWB, throttle 1800)...
+  alt= 18.15 m  roll=   0.2  pitch=   0.1  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1008, 1500, 1500, 1500)
+  alt= 18.15 m  roll=  -0.3  pitch=  -0.7  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1231, 1500, 1500, 1500)
+  alt= 18.14 m  roll=  -0.8  pitch=  -2.0  gs=  2.8 m/s  tilt/ail/vtL/vtR=(1452, 1503, 1505, 1503)
+  alt= 18.13 m  roll=   0.9  pitch=  -0.0  gs=  6.4 m/s  tilt/ail/vtL/vtR=(1500, 1509, 1562, 1558)
+  alt= 18.18 m  roll=   0.8  pitch=   3.8  gs=  8.9 m/s  tilt/ail/vtL/vtR=(1500, 1479, 1531, 1542)
+  alt= 18.35 m  roll=   1.9  pitch=   3.3  gs=  8.3 m/s  tilt/ail/vtL/vtR=(1500, 1498, 1489, 1490)
+  alt= 18.50 m  roll=   0.8  pitch=  -1.4  gs=  6.1 m/s  tilt/ail/vtL/vtR=(1500, 1500, 1500, 1500)
+  alt= 18.41 m  roll=  -0.7  pitch=  -4.2  gs=  6.8 m/s  tilt/ail/vtL/vtR=(1500, 1494, 1516, 1520)
+  alt= 18.23 m  roll=   1.0  pitch=  -1.9  gs= 10.2 m/s  tilt/ail/vtL/vtR=(1500, 1503, 1678, 1676)
+  alt= 18.11 m  roll=   0.8  pitch=   0.2  gs= 13.0 m/s  tilt/ail/vtL/vtR=(1500, 1434, 1618, 1651)
+  alt= 18.17 m  roll=   0.7  pitch=   1.5  gs= 15.2 m/s  tilt/ail/vtL/vtR=(1500, 1483, 1568, 1576)
+  alt= 18.44 m  roll=  -1.6  pitch=   0.6  gs= 17.1 m/s  tilt/ail/vtL/vtR=(1500, 1492, 1535, 1539)
+  alt= 18.71 m  roll=   0.2  pitch=   0.1  gs= 18.6 m/s  tilt/ail/vtL/vtR=(1713, 1537, 1554, 1535)
+  alt= 18.66 m  roll=   0.0  pitch=   0.9  gs= 20.1 m/s  tilt/ail/vtL/vtR=(1935, 1498, 1569, 1570)
+  alt= 18.55 m  roll=  -0.8  pitch=   0.1  gs= 20.3 m/s  tilt/ail/vtL/vtR=(2000, 1515, 1548, 1540)
+  alt= 18.32 m  roll=   0.7  pitch=   0.4  gs= 20.5 m/s  tilt/ail/vtL/vtR=(2000, 1499, 1537, 1537)
+  alt= 18.07 m  roll=   0.1  pitch=   0.8  gs= 20.6 m/s  tilt/ail/vtL/vtR=(2000, 1519, 1540, 1530)
+  alt= 17.92 m  roll=   0.6  pitch=   0.7  gs= 20.7 m/s  tilt/ail/vtL/vtR=(2000, 1506, 1538, 1535)
+  alt= 17.82 m  roll=  -0.1  pitch=   1.8  gs= 20.8 m/s  tilt/ail/vtL/vtR=(2000, 1507, 1537, 1533)
+  alt= 17.87 m  roll=   0.1  pitch=   2.2  gs= 20.8 m/s  tilt/ail/vtL/vtR=(2000, 1508, 1532, 1528)
+  alt= 17.99 m  roll=   0.1  pitch=   2.0  gs= 20.7 m/s  tilt/ail/vtL/vtR=(2000, 1505, 1529, 1527)
+  alt= 18.11 m  roll=   0.2  pitch=   2.3  gs= 20.7 m/s  tilt/ail/vtL/vtR=(2000, 1499, 1530, 1531)
+  alt= 18.22 m  roll=   0.1  pitch=   2.5  gs= 20.7 m/s  tilt/ail/vtL/vtR=(2000, 1514, 1531, 1524)
+  alt= 18.38 m  roll=   0.3  pitch=   2.4  gs= 20.6 m/s  tilt/ail/vtL/vtR=(2000, 1503, 1527, 1525)
+  alt= 18.55 m  roll=   0.0  pitch=   1.6  gs= 20.6 m/s  tilt/ail/vtL/vtR=(2000, 1510, 1530, 1524)
+
+forward flight: max_gs=20.8 m/s  min_alt=17.8 m  max_tilt=4.2 deg  -> PASS
+Back to QHOVER, then QLAND...
+  alt= 18.61 m  roll=   0.3  pitch=   1.9  gs= 20.6 m/s  tilt/ail/vtL/vtR=(2000, 1515, 1534, 1526)
+  alt= 18.62 m  roll=   0.0  pitch=  -4.5  gs= 19.7 m/s  tilt/ail/vtL/vtR=(1822, 1480, 1512, 1512)
+  alt= 18.09 m  roll=   0.1  pitch=  -5.6  gs= 20.6 m/s  tilt/ail/vtL/vtR=(1600, 1497, 1587, 1587)
+  alt= 17.25 m  roll=   0.1  pitch=  -0.8  gs= 22.3 m/s  tilt/ail/vtL/vtR=(1377, 1491, 1600, 1600)
+  alt= 17.43 m  roll=  -0.4  pitch=   3.9  gs= 22.9 m/s  tilt/ail/vtL/vtR=(1155, 1516, 1515, 1515)
+  alt= 18.43 m  roll=  -0.8  pitch=   2.8  gs= 21.6 m/s  tilt/ail/vtL/vtR=(1000, 1508, 1451, 1451)
+  alt= 19.12 m  roll=   0.1  pitch=   0.7  gs= 20.8 m/s  tilt/ail/vtL/vtR=(1000, 1507, 1452, 1452)
+  alt= 19.36 m  roll=  -0.4  pitch=   0.2  gs= 20.3 m/s  tilt/ail/vtL/vtR=(1000, 1505, 1478, 1478)
+  alt= 19.48 m  roll=  -0.3  pitch=   0.1  gs= 20.1 m/s  tilt/ail/vtL/vtR=(1000, 1506, 1495, 1495)
+  alt= 19.50 m  roll=  -0.2  pitch=  -0.1  gs= 19.2 m/s  tilt/ail/vtL/vtR=(1000, 1510, 1497, 1497)
+  alt= 19.44 m  roll=  -0.3  pitch=  -0.2  gs= 18.9 m/s  tilt/ail/vtL/vtR=(1000, 1510, 1501, 1501)
+  alt= 19.32 m  roll=  -0.2  pitch=  -0.3  gs= 18.6 m/s  tilt/ail/vtL/vtR=(1000, 1505, 1507, 1507)
+  alt= 19.20 m  roll=  -0.3  pitch=  -0.3  gs= 18.1 m/s  tilt/ail/vtL/vtR=(1000, 1510, 1509, 1509)
+  alt= 18.88 m  roll=  -0.1  pitch=   1.9  gs= 17.1 m/s  tilt/ail/vtL/vtR=(1000, 1504, 1507, 1507)
+  alt= 18.84 m  roll=  -7.1  pitch=  13.4  gs= 17.2 m/s  tilt/ail/vtL/vtR=(1000, 1469, 1688, 1688)
+  alt= 19.95 m  roll=  -4.3  pitch=  13.9  gs= 16.0 m/s  tilt/ail/vtL/vtR=(1000, 1518, 1576, 1576)
+  alt= 21.37 m  roll=  -0.1  pitch=  14.0  gs= 14.3 m/s  tilt/ail/vtL/vtR=(1000, 1518, 1538, 1538)
+  alt= 22.52 m  roll=  -1.0  pitch=  13.9  gs= 13.1 m/s  tilt/ail/vtL/vtR=(1000, 1514, 1535, 1535)
+  alt= 23.47 m  roll=  -2.2  pitch=  14.0  gs= 12.2 m/s  tilt/ail/vtL/vtR=(1000, 1491, 1548, 1548)
+  alt= 24.18 m  roll=  -1.5  pitch=  12.9  gs= 11.2 m/s  tilt/ail/vtL/vtR=(1000, 1487, 1567, 1567)
+  alt= 24.49 m  roll=  -1.1  pitch=   8.9  gs= 10.3 m/s  tilt/ail/vtL/vtR=(1000, 1498, 1637, 1637)
+  alt= 23.95 m  roll=   4.4  pitch=  -0.5  gs=  9.6 m/s  tilt/ail/vtL/vtR=(1000, 1501, 1700, 1700)
+  alt= 22.56 m  roll=   1.4  pitch=  10.2  gs=  9.5 m/s  tilt/ail/vtL/vtR=(1000, 1461, 1700, 1700)
+  alt= 20.89 m  roll=  13.4  pitch=   8.0  gs=  7.7 m/s  tilt/ail/vtL/vtR=(1000, 1556, 1653, 1653)
+  alt= 19.80 m  roll=  10.1  pitch= -12.3  gs=  5.7 m/s  tilt/ail/vtL/vtR=(1000, 1506, 1477, 1477)
+  alt= 19.41 m  roll=  -5.8  pitch= -12.3  gs=  4.5 m/s  tilt/ail/vtL/vtR=(1000, 1494, 1501, 1501)
+  alt= 19.23 m  roll= -12.0  pitch=  -4.6  gs=  3.7 m/s  tilt/ail/vtL/vtR=(1000, 1509, 1479, 1479)
+  alt= 18.97 m  roll= -13.0  pitch=  -5.5  gs=  3.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1496, 1496)
+  alt= 18.61 m  roll=  -3.6  pitch= -14.9  gs=  2.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 18.19 m  roll=  13.8  pitch=   6.6  gs=  2.0 m/s  tilt/ail/vtL/vtR=(1000, 1428, 1491, 1491)
+  alt= 17.75 m  roll= -11.3  pitch=   7.9  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1469, 1569, 1569)
+  alt= 17.27 m  roll= -10.7  pitch=  -6.5  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1504, 1506, 1506)
+  alt= 16.82 m  roll=   7.4  pitch= -11.8  gs=  1.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 16.35 m  roll=   9.6  pitch=   3.4  gs=  1.5 m/s  tilt/ail/vtL/vtR=(1000, 1469, 1525, 1525)
+  alt= 15.88 m  roll=   2.2  pitch=   7.9  gs=  2.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1478, 1478)
+  alt= 15.53 m  roll=  -7.3  pitch=   4.9  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 15.21 m  roll=  -8.6  pitch=  -6.4  gs=  2.2 m/s  tilt/ail/vtL/vtR=(1000, 1536, 1514, 1514)
+  alt= 14.86 m  roll=  -0.5  pitch=  -9.9  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1546, 1560, 1560)
+  alt= 14.44 m  roll=   8.0  pitch=  -9.6  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1469, 1489, 1489)
+  alt= 14.03 m  roll=  12.0  pitch=  -3.0  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 13.68 m  roll=  11.7  pitch=   8.3  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 13.33 m  roll=   1.5  pitch=  12.8  gs=  2.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 12.93 m  roll=  -8.9  pitch=   7.8  gs=  1.7 m/s  tilt/ail/vtL/vtR=(1000, 1501, 1500, 1500)
+  alt= 12.57 m  roll= -13.4  pitch=  -0.5  gs=  1.7 m/s  tilt/ail/vtL/vtR=(1000, 1530, 1514, 1514)
+  alt= 12.25 m  roll= -11.6  pitch=  -7.6  gs=  1.8 m/s  tilt/ail/vtL/vtR=(1000, 1510, 1513, 1513)
+  alt= 11.82 m  roll= -10.8  pitch=  -6.6  gs=  2.1 m/s  tilt/ail/vtL/vtR=(1000, 1476, 1539, 1539)
+  alt= 11.32 m  roll= -10.6  pitch=   3.9  gs=  2.2 m/s  tilt/ail/vtL/vtR=(1000, 1424, 1539, 1539)
+  alt= 10.88 m  roll=  13.4  pitch=   5.0  gs=  2.9 m/s  tilt/ail/vtL/vtR=(1000, 1559, 1568, 1568)
+  alt= 10.58 m  roll= -12.2  pitch=  -8.6  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1501, 1475, 1475)
+  alt= 10.42 m  roll=   1.0  pitch=   9.2  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= 10.16 m  roll=  10.2  pitch=  -3.9  gs=  0.7 m/s  tilt/ail/vtL/vtR=(1000, 1493, 1504, 1504)
+  alt=  9.79 m  roll= -10.9  pitch=  -4.5  gs=  0.6 m/s  tilt/ail/vtL/vtR=(1000, 1498, 1500, 1500)
+  alt=  9.42 m  roll=   4.8  pitch=   8.7  gs=  0.5 m/s  tilt/ail/vtL/vtR=(1000, 1502, 1508, 1508)
+  alt=  9.08 m  roll=   6.4  pitch=   2.7  gs=  1.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  8.72 m  roll=   7.8  pitch=   5.6  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1511, 1510, 1510)
+  alt=  8.32 m  roll=  -3.4  pitch=  13.3  gs=  3.2 m/s  tilt/ail/vtL/vtR=(1000, 1552, 1563, 1563)
+  alt=  7.93 m  roll= -11.9  pitch= -12.4  gs=  4.1 m/s  tilt/ail/vtL/vtR=(1000, 1451, 1483, 1483)
+  alt=  7.68 m  roll=  19.7  pitch=  -0.2  gs=  3.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1499, 1499)
+  alt=  7.42 m  roll=  -4.2  pitch=  11.5  gs=  1.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  7.00 m  roll=  -7.5  pitch=  -5.5  gs=  0.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  6.67 m  roll=  -1.3  pitch=  -3.7  gs=  1.5 m/s  tilt/ail/vtL/vtR=(1000, 1506, 1520, 1520)
+  alt=  6.42 m  roll=   5.8  pitch= -10.3  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1450, 1469, 1469)
+  alt=  6.23 m  roll=  11.6  pitch=   4.0  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1499, 1497, 1497)
+  alt=  6.06 m  roll=  -0.5  pitch=  13.6  gs=  2.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  5.80 m  roll= -11.7  pitch=   1.7  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  5.51 m  roll=  -7.4  pitch=  -4.4  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1541, 1503, 1503)
+  alt=  5.26 m  roll=  -5.2  pitch= -10.8  gs=  2.7 m/s  tilt/ail/vtL/vtR=(1000, 1433, 1571, 1571)
+  alt=  5.02 m  roll=   1.5  pitch= -11.9  gs=  2.8 m/s  tilt/ail/vtL/vtR=(1000, 1488, 1509, 1509)
+  alt=  4.78 m  roll=   9.2  pitch= -10.3  gs=  2.8 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.55 m  roll=  14.3  pitch=  -1.0  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.32 m  roll=  10.2  pitch=   8.0  gs=  2.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  4.10 m  roll=   0.1  pitch=  12.0  gs=  1.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.88 m  roll=  -8.5  pitch=   8.0  gs=  2.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  3.63 m  roll=  -9.8  pitch=   3.2  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1495, 1500, 1500)
+  alt=  3.40 m  roll= -11.7  pitch=  -3.6  gs=  2.8 m/s  tilt/ail/vtL/vtR=(1000, 1553, 1549, 1549)
+  alt=  3.16 m  roll=  -9.2  pitch=  -4.7  gs=  2.6 m/s  tilt/ail/vtL/vtR=(1000, 1512, 1575, 1575)
+  alt=  2.94 m  roll=  -8.7  pitch=  -4.7  gs=  2.3 m/s  tilt/ail/vtL/vtR=(1000, 1489, 1546, 1546)
+  alt=  2.77 m  roll= -12.9  pitch=  -3.2  gs=  3.3 m/s  tilt/ail/vtL/vtR=(1000, 1480, 1512, 1512)
+  alt=  2.52 m  roll= -10.4  pitch=   9.6  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1474, 1512, 1512)
+  alt=  2.20 m  roll=  16.2  pitch=   2.1  gs=  2.4 m/s  tilt/ail/vtL/vtR=(1000, 1588, 1518, 1518)
+  alt=  1.95 m  roll= -13.4  pitch=  -7.7  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1495, 1495)
+  alt=  1.79 m  roll=  -1.4  pitch=   6.1  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1511, 1489, 1489)
+  alt=  1.60 m  roll=   7.8  pitch=   0.1  gs=  1.3 m/s  tilt/ail/vtL/vtR=(1000, 1497, 1497, 1497)
+  alt=  1.38 m  roll=  -3.2  pitch=  -5.5  gs=  1.7 m/s  tilt/ail/vtL/vtR=(1000, 1493, 1500, 1500)
+  alt=  1.13 m  roll=  -8.1  pitch=   5.2  gs=  2.5 m/s  tilt/ail/vtL/vtR=(1000, 1513, 1471, 1471)
+  alt=  0.90 m  roll=  10.8  pitch=   4.6  gs=  2.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt=  0.59 m  roll=   8.3  pitch=   2.9  gs=  2.3 m/s  tilt/ail/vtL/vtR=(1000, 1498, 1508, 1508)
+  alt=  0.30 m  roll=   6.9  pitch=   8.9  gs=  2.7 m/s  tilt/ail/vtL/vtR=(1000, 1513, 1571, 1571)
+  alt=  0.14 m  roll=  -8.1  pitch=  11.7  gs=  2.7 m/s  tilt/ail/vtL/vtR=(1000, 1516, 1541, 1541)
+  alt= -0.13 m  roll=  -7.3  pitch=  -8.4  gs=  2.9 m/s  tilt/ail/vtL/vtR=(1000, 1485, 1484, 1484)
+  alt= -0.20 m  roll=   8.3  pitch=  -9.4  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.24 m  roll=  12.3  pitch=   4.0  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1505, 1499, 1499)
+  alt= -0.31 m  roll=   8.2  pitch=   9.9  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1504, 1501, 1501)
+  alt= -0.32 m  roll=   4.1  pitch=   9.8  gs=  1.1 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.31 m  roll=   7.1  pitch=  10.1  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.35 m  roll=  10.0  pitch=  10.2  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.37 m  roll=  11.6  pitch=   9.0  gs=  0.9 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.40 m  roll=   6.8  pitch=   5.4  gs=  0.6 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.40 m  roll=   4.8  pitch=   6.3  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.36 m  roll=   4.3  pitch=  10.3  gs=  0.7 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.30 m  roll=   6.3  pitch=  10.4  gs=  1.0 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.25 m  roll=   9.3  pitch=  10.4  gs=  1.3 m/s  tilt/ail/vtL/vtR=(1000, 1500, 1500, 1500)
+  alt= -0.15 m  roll=   1.7  pitch=  10.2  gs=  1.2 m/s  tilt/ail/vtL/vtR=(1000, 1560, 1453, 1453)
+  alt=  0.01 m  roll= -11.0  pitch=   8.8  gs=  0.8 m/s  tilt/ail/vtL/vtR=(1000, 1900, 1300, 1300)
+  alt=  0.02 m  roll= -12.1  pitch=  -0.8  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1772, 1377, 1377)
+  alt=  0.01 m  roll= -11.1  pitch=   4.5  gs=  0.4 m/s  tilt/ail/vtL/vtR=(1000, 1778, 1546, 1546)
+  alt=  0.02 m  roll= -11.7  pitch=   0.6  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1813, 1343, 1343)
+  alt=  0.03 m  roll= -11.0  pitch=   3.7  gs=  0.2 m/s  tilt/ail/vtL/vtR=(1000, 1817, 1506, 1506)
+  alt=  0.03 m  roll= -11.2  pitch=   2.3  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1848, 1515, 1515)
+  alt=  0.04 m  roll= -11.2  pitch=   1.8  gs=  0.3 m/s  tilt/ail/vtL/vtR=(1000, 1856, 1511, 1511)
+  alt=  0.04 m  roll= -11.3  pitch=   2.0  gs=  0.5 m/s  tilt/ail/vtL/vtR=(1000, 1749, 1477, 1477)
+  alt=  0.05 m  roll= -11.7  pitch=   2.4  gs=  0.6 m/s  tilt/ail/vtL/vtR=(1000, 1772, 1434, 1434)
+landing: final alt=0.05 m -> LANDED
+scripts/run_headless_test.sh: line 41:  4828 Killed                  ( cd "$LOG_DIR" && rm -f eeprom.bin && exec "$SITL_BIN" --model JSON --speedup 1 --slave 0 --defaults "$ARDUPILOT_DIR/Tools/autotest/models/plane.parm,$PARAMS" --home 13.0827,80.2707,10,90 -I0 ) > "$LOG_DIR/sitl.log" 2>&1
